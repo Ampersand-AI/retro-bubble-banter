@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Menu, Settings, Robot } from 'lucide-react';
+import { Menu, Settings, Bot } from 'lucide-react';
 
 const Header = () => {
   return (
@@ -28,7 +28,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <Settings className="w-6 h-6 text-amp-gray hover:text-amp-cyan cursor-pointer transition-colors" />
           <div className="pixel-border border-amp-cyan w-8 h-8 bg-amp-blue flex items-center justify-center">
-            <Robot className="w-6 h-6 text-amp-cyan" />
+            <Bot className="w-6 h-6 text-amp-cyan" />
           </div>
         </div>
       </div>
