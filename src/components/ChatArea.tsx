@@ -15,9 +15,10 @@ interface ChatAreaProps {
 }
 
 const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages update
+  // Scroll to bottom when messages update
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -26,8 +27,8 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
 
   return (
     <div className="flex flex-col pt-16 pb-20 h-screen">
-      <ScrollArea className="flex-1 px-4 md:px-8">
-        <div className="max-w-3xl mx-auto py-4">
+      <div className="flex-1 px-4 md:px-8 overflow-hidden" ref={scrollContainerRef}>
+        <div className="max-w-3xl mx-auto py-4 h-[calc(100vh-9rem)] overflow-y-auto">
           {messages.map((message) => (
             <MessageBubble
               key={message.id}
@@ -44,7 +45,7 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
           )}
           <div ref={chatEndRef} />
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };

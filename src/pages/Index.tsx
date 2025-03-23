@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
 import InputSection from '../components/InputSection';
 import { AIModel } from '../components/ModelSelect';
+import { toast } from "../components/ui/use-toast";
 
 interface Message {
   id: number;
@@ -30,6 +31,125 @@ const Index = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [messageIdCounter, setMessageIdCounter] = useState(2);
   const [selectedModel, setSelectedModel] = useState<AIModel>('openai');
+  const [apiStatus, setApiStatus] = useState<{[key in AIModel]: boolean}>({
+    openai: false,
+    claude: false,
+    gemini: false
+  });
+
+  // Check API status on load
+  useEffect(() => {
+    const validateApis = async () => {
+      try {
+        // Test OpenAI API
+        const openaiStatus = await testOpenAIApi();
+        
+        // Test Claude API
+        const claudeStatus = await testClaudeApi();
+        
+        // Test Gemini API
+        const geminiStatus = await testGeminiApi();
+        
+        setApiStatus({
+          openai: openaiStatus,
+          claude: claudeStatus,
+          gemini: geminiStatus
+        });
+        
+        // Toast notifications for API status
+        if (openaiStatus) {
+          toast({ title: "OpenAI API Connected", description: "Successfully connected to OpenAI API" });
+        } else {
+          toast({ 
+            title: "OpenAI API Connection Issue", 
+            description: "Could not connect to OpenAI API", 
+            variant: "destructive" 
+          });
+        }
+        
+        if (claudeStatus) {
+          toast({ title: "Claude API Connected", description: "Successfully connected to Claude API" });
+        } else {
+          toast({ 
+            title: "Claude API Connection Issue", 
+            description: "Could not connect to Claude API", 
+            variant: "destructive" 
+          });
+        }
+        
+        if (geminiStatus) {
+          toast({ title: "Gemini API Connected", description: "Successfully connected to Gemini API" });
+        } else {
+          toast({ 
+            title: "Gemini API Connection Issue", 
+            description: "Could not connect to Gemini API", 
+            variant: "destructive" 
+          });
+        }
+        
+      } catch (error) {
+        console.error("Error validating APIs:", error);
+      }
+    };
+    
+    validateApis();
+  }, []);
+
+  const testOpenAIApi = async (): Promise<boolean> => {
+    try {
+      const response = await fetch('https://api.openai.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${API_KEYS.openai}`
+        }
+      });
+      
+      return response.status === 200;
+    } catch (error) {
+      console.error("OpenAI API test error:", error);
+      return false;
+    }
+  };
+
+  const testClaudeApi = async (): Promise<boolean> => {
+    try {
+      // For Claude, we'll make a minimal message request to test
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEYS.claude,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-haiku-20240307',
+          max_tokens: 10,
+          messages: [
+            { role: 'user', content: 'Hi' }
+          ]
+        })
+      });
+      
+      return response.status === 200;
+    } catch (error) {
+      console.error("Claude API test error:", error);
+      return false;
+    }
+  };
+
+  const testGeminiApi = async (): Promise<boolean> => {
+    try {
+      // For Gemini, we'll check if we can access the models endpoint
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${API_KEYS.gemini}`, {
+        method: 'GET'
+      });
+      
+      return response.status === 200;
+    } catch (error) {
+      console.error("Gemini API test error:", error);
+      return false;
+    }
+  };
 
   const isStartupRelated = (text: string) => {
     const startupKeywords = [
@@ -141,11 +261,17 @@ const Index = () => {
         })
       });
       
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("OpenAI API error:", errorData);
+        return `Error: ${errorData.error?.message || "Unknown error with OpenAI API"}`;
+      }
+      
       const data = await response.json();
       return data.choices?.[0]?.message?.content || simulateResponse(userMessage);
     } catch (error) {
       console.error("OpenAI API error:", error);
-      return simulateResponse(userMessage);
+      return `Error communicating with OpenAI. Please try again.`;
     }
   };
 
@@ -159,7 +285,7 @@ const Index = () => {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-3-sonnet-20240229',
+          model: 'claude-3-haiku-20240307',
           messages: [
             { role: 'system', content: STARTUP_SYSTEM_PROMPT },
             { role: 'user', content: userMessage }
@@ -168,17 +294,23 @@ const Index = () => {
         })
       });
       
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Claude API error:", errorData);
+        return `Error: ${errorData.error?.message || "Unknown error with Claude API"}`;
+      }
+      
       const data = await response.json();
       return data.content?.[0]?.text || simulateResponse(userMessage);
     } catch (error) {
       console.error("Claude API error:", error);
-      return simulateResponse(userMessage);
+      return `Error communicating with Claude. Please try again.`;
     }
   };
 
   const fetchGeminiResponse = async (userMessage: string) => {
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEYS.gemini}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEYS.gemini}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -198,11 +330,17 @@ const Index = () => {
         })
       });
       
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Gemini API error:", errorData);
+        return `Error: ${errorData.error?.message || "Unknown error with Gemini API"}`;
+      }
+      
       const data = await response.json();
       return data.candidates?.[0]?.content?.parts?.[0]?.text || simulateResponse(userMessage);
     } catch (error) {
       console.error("Gemini API error:", error);
-      return simulateResponse(userMessage);
+      return `Error communicating with Gemini. Please try again.`;
     }
   };
 

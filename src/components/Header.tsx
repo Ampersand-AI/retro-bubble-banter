@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Menu, Settings, Bot } from 'lucide-react';
+import { Menu, Bot } from 'lucide-react';
 import ModelSelect, { AIModel } from './ModelSelect';
+import SystemArtifact from './SystemArtifact';
 
 interface HeaderProps {
   selectedModel: AIModel;
@@ -17,10 +18,10 @@ const Header = ({ selectedModel, onModelChange }: HeaderProps) => {
           <h1 className="font-pixel text-md md:text-xl text-amp-cyan tracking-wider">AMP AI</h1>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center">
+          <SystemArtifact />
           <ModelSelect selectedModel={selectedModel} onModelChange={onModelChange} />
-          <Settings className="w-6 h-6 text-amp-gray hover:text-amp-cyan cursor-pointer transition-colors" />
-          <div className="pixel-border border-amp-cyan w-8 h-8 bg-amp-blue flex items-center justify-center">
+          <div className="pixel-border border-amp-cyan w-8 h-8 bg-amp-blue flex items-center justify-center ml-4">
             <Bot className="w-6 h-6 text-amp-cyan" />
           </div>
         </div>
