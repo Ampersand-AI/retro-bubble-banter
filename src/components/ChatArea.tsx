@@ -41,7 +41,7 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex flex-row h-screen items-center justify-center gap-6">
+    <div className="flex flex-row h-screen items-end justify-center gap-6 pb-16">
       <div className="w-[850px] h-[850px] max-w-[850px] max-h-[850px] overflow-hidden">
         <ScrollArea className="h-full pr-[25px]">
           <div className="px-4 py-4">

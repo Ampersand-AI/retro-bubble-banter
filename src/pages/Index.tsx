@@ -32,42 +32,41 @@ const DEFAULT_SUBMODELS = {
   gemini: 'gemini-1.5-pro'
 };
 
-const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. You can answer questions about startups, investments, investor decks, deal types, venture capital firms, angel investors, and related topics.";
-
 // Helper function to estimate token count
 const estimateTokens = (text: string): number => {
   // Rough estimate: ~4 chars per token for English text
   return Math.ceil(text.length / 4);
 };
 
-const Index = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Hello! I'm Zack AI, your retro-futuristic startup investment assistant. How can I help you today?",
-      isAi: true,
-      tokenCount: {
-        input: 0,
-        output: estimateTokens("Hello! I'm Zack AI, your retro-futuristic startup investment assistant. How can I help you today?")
-      }
+// Define simulateResponse which is used in the fetch functions
+const simulateResponse = (userMessage: string) => {
+  // List of possible startup-related AI responses
+  const responses = [
+    "Based on current market trends, startups in this sector typically raise between $1-3M for their seed round.",
+    "Venture capital firms usually look for startups with a clear path to profitability within 3-5 years.",
+    "For early-stage startups, angel investors often provide capital in exchange for 10-20% equity.",
+    "Series A funding typically ranges from $2M to $15M, depending on the industry and growth potential.",
+    "The average valuation multiple for SaaS startups is currently 6-10x ARR.",
+    "Accelerator programs like Y Combinator take about 7% equity in exchange for mentorship and initial funding.",
+    "Term sheets typically include liquidation preferences, anti-dilution provisions, and board seat allocations.",
+    "For B2B startups, demonstrating a strong CAC to LTV ratio is crucial when pitching to investors.",
+    `Regarding "${userMessage}", many founders overlook the importance of proper cap table management.`,
+    "When structuring equity for early employees, a 4-year vesting schedule with a 1-year cliff is standard practice."
+  ];
+  
+  // Choose a random response
+  const response = responses[Math.floor(Math.random() * responses.length)];
+  
+  return {
+    text: response,
+    tokenCount: {
+      input: estimateTokens(userMessage),
+      output: estimateTokens(response)
     }
-  ]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [messageIdCounter, setMessageIdCounter] = useState(2);
-  const [selectedModel, setSelectedModel] = useState<AIModel>('openai');
-  const [selectedSubModel, setSelectedSubModel] = useState<string>(DEFAULT_SUBMODELS.openai);
-  const [apiStatus, setApiStatus] = useState<{[key in AIModel]: boolean}>({
-    openai: false,
-    claude: false,
-    gemini: false
-  });
-  const [showApiStatus, setShowApiStatus] = useState(false);
+  };
+};
 
-  // Update submodel when the main model changes
-  useEffect(() => {
-    setSelectedSubModel(DEFAULT_SUBMODELS[selectedModel]);
-  }, [selectedModel]);
-
+const Index = () => {
   // *** MOVED FUNCTION DECLARATIONS UP ***
   const fetchOpenAIResponse = useCallback(async (userMessage: string, subModel: string) => {
     try {
@@ -83,7 +82,6 @@ const Index = () => {
         body: JSON.stringify({
           model: subModel || 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: STARTUP_SYSTEM_PROMPT },
             { role: 'user', content: userMessage }
           ],
           max_tokens: 1000
@@ -99,7 +97,7 @@ const Index = () => {
         return {
           text: `Error: ${errorData.error?.message || "Unknown error with OpenAI API"}`,
           tokenCount: {
-            input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+            input: estimateTokens(userMessage),
             output: 0
           }
         };
@@ -111,7 +109,7 @@ const Index = () => {
       return {
         text: aiResponse,
         tokenCount: {
-          input: data.usage?.prompt_tokens || estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          input: data.usage?.prompt_tokens || estimateTokens(userMessage),
           output: data.usage?.completion_tokens || estimateTokens(aiResponse)
         }
       };
@@ -120,7 +118,7 @@ const Index = () => {
       return {
         text: `Error communicating with OpenAI. Please try again.`,
         tokenCount: {
-          input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          input: estimateTokens(userMessage),
           output: 0
         }
       };
@@ -142,7 +140,6 @@ const Index = () => {
         body: JSON.stringify({
           model: subModel || 'claude-3-haiku-20240307',
           messages: [
-            { role: 'system', content: STARTUP_SYSTEM_PROMPT },
             { role: 'user', content: userMessage }
           ],
           max_tokens: 1000
@@ -158,7 +155,7 @@ const Index = () => {
         return {
           text: `Error: ${errorData.error?.message || "Unknown error with Claude API"}`,
           tokenCount: {
-            input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+            input: estimateTokens(userMessage),
             output: 0
           }
         };
@@ -170,7 +167,7 @@ const Index = () => {
       return {
         text: aiResponse,
         tokenCount: {
-          input: data.usage?.prompt_tokens || estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          input: data.usage?.prompt_tokens || estimateTokens(userMessage),
           output: data.usage?.completion_tokens || estimateTokens(aiResponse)
         }
       };
@@ -179,7 +176,7 @@ const Index = () => {
       return {
         text: `Error communicating with Claude. Please try again.`,
         tokenCount: {
-          input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          input: estimateTokens(userMessage),
           output: 0
         }
       };
@@ -200,7 +197,6 @@ const Index = () => {
           contents: [
             {
               parts: [
-                { text: STARTUP_SYSTEM_PROMPT },
                 { text: userMessage }
               ]
             }
@@ -220,7 +216,7 @@ const Index = () => {
         return {
           text: `Error: ${errorData.error?.message || "Unknown error with Gemini API"}`,
           tokenCount: {
-            input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+            input: estimateTokens(userMessage),
             output: 0
           }
         };
@@ -232,7 +228,7 @@ const Index = () => {
       return {
         text: aiResponse,
         tokenCount: {
-          input: data.usage?.prompt_tokens || estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          input: data.usage?.prompt_tokens || estimateTokens(userMessage),
           output: data.usage?.completion_tokens || estimateTokens(aiResponse)
         }
       };
@@ -241,40 +237,39 @@ const Index = () => {
       return {
         text: `Error communicating with Gemini. Please try again.`,
         tokenCount: {
-          input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          input: estimateTokens(userMessage),
           output: 0
         }
       };
     }
   }, []);
 
-  // Define simulateResponse which is used in the fetch functions
-  const simulateResponse = (userMessage: string) => {
-    // List of possible startup-related AI responses
-    const responses = [
-      "Based on current market trends, startups in this sector typically raise between $1-3M for their seed round.",
-      "Venture capital firms usually look for startups with a clear path to profitability within 3-5 years.",
-      "For early-stage startups, angel investors often provide capital in exchange for 10-20% equity.",
-      "Series A funding typically ranges from $2M to $15M, depending on the industry and growth potential.",
-      "The average valuation multiple for SaaS startups is currently 6-10x ARR.",
-      "Accelerator programs like Y Combinator take about 7% equity in exchange for mentorship and initial funding.",
-      "Term sheets typically include liquidation preferences, anti-dilution provisions, and board seat allocations.",
-      "For B2B startups, demonstrating a strong CAC to LTV ratio is crucial when pitching to investors.",
-      `Regarding "${userMessage}", many founders overlook the importance of proper cap table management.`,
-      "When structuring equity for early employees, a 4-year vesting schedule with a 1-year cliff is standard practice."
-    ];
-    
-    // Choose a random response
-    const response = responses[Math.floor(Math.random() * responses.length)];
-    
-    return {
-      text: response,
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      text: "Welcome to Zack AI by Ampersand! You can experience various premium AI models at a fraction of the cost.",
+      isAi: true,
       tokenCount: {
-        input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
-        output: estimateTokens(response)
+        input: 0,
+        output: estimateTokens("Welcome to Zack AI by Ampersand! You can experience various premium AI models at a fraction of the cost.")
       }
-    };
-  };
+    }
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [messageIdCounter, setMessageIdCounter] = useState(2);
+  const [selectedModel, setSelectedModel] = useState<AIModel>('openai');
+  const [selectedSubModel, setSelectedSubModel] = useState<string>(DEFAULT_SUBMODELS.openai);
+  const [apiStatus, setApiStatus] = useState<{[key in AIModel]: boolean}>({
+    openai: false,
+    claude: false,
+    gemini: false
+  });
+  const [showApiStatus, setShowApiStatus] = useState(false);
+
+  // Update submodel when the main model changes
+  useEffect(() => {
+    setSelectedSubModel(DEFAULT_SUBMODELS[selectedModel]);
+  }, [selectedModel]);
 
   // Check API status on load - optimized with useCallback
   useEffect(() => {
@@ -369,11 +364,6 @@ const Index = () => {
     }
   }, []);
 
-  const isStartupRelated = (text: string) => {
-    // Always return true now - we've expanded our knowledge base
-    return true;
-  };
-
   const handleModelChange = (model: AIModel) => {
     setSelectedModel(model);
     setSelectedSubModel(DEFAULT_SUBMODELS[model]);
@@ -407,27 +397,6 @@ const Index = () => {
     
     try {
       let response;
-      
-      if (!isStartupRelated(userMessage)) {
-        // Return a canned response for non-startup related questions
-        setTimeout(() => {
-          setMessages(prevMessages => [
-            ...prevMessages,
-            {
-              id: messageIdCounter + 1,
-              text: "I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.",
-              isAi: true,
-              tokenCount: {
-                input: estimateTokens(userMessage),
-                output: estimateTokens("I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.")
-              }
-            }
-          ]);
-          setMessageIdCounter(prev => prev + 2);
-          setIsTyping(false);
-        }, 1000);
-        return;
-      }
       
       switch (selectedModel) {
         case 'openai':
@@ -501,28 +470,6 @@ const Index = () => {
       try {
         let response;
         
-        if (!isStartupRelated(message)) {
-          // Return a canned response for non-startup related questions
-          setTimeout(() => {
-            const cannedResponse = "I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.";
-            setMessages(prevMessages => [
-              ...prevMessages,
-              {
-                id: userMessageId + 1,
-                text: cannedResponse,
-                isAi: true,
-                tokenCount: {
-                  input: userTokenCount,
-                  output: estimateTokens(cannedResponse)
-                }
-              }
-            ]);
-            setMessageIdCounter(prev => prev + 2);
-            setIsTyping(false);
-          }, 1000);
-          return;
-        }
-        
         switch (selectedModel) {
           case 'openai':
             response = await fetchOpenAIResponse(message, selectedSubModel);
@@ -569,7 +516,7 @@ const Index = () => {
     };
     
     fetchResponse();
-  }, [messageIdCounter, selectedModel, selectedSubModel, fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse, isStartupRelated]);
+  }, [messageIdCounter, selectedModel, selectedSubModel, fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse]);
 
   // Sound effects for UI interactions (subtle blips and bloops)
   useEffect(() => {

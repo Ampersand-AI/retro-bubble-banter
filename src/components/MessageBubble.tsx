@@ -20,7 +20,7 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
       setDisplayedText('');
       
       let i = 0;
-      const speed = 5; // Even faster typing speed (reduced from 10ms to 5ms)
+      const speed = 2; // Even faster typing speed (reduced from 5ms to 2ms)
       
       const typeWriter = () => {
         if (i < message.length) {
@@ -50,7 +50,7 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
       {isAi && (
         <div className="w-8 h-8 mr-2 mt-1 bg-amp-blue flex items-center justify-center flex-shrink-0">
           <img 
-            src="/logo.png" 
+            src="/lovable-uploads/1c140dbc-d493-42f7-ac2a-723f1a7e0b63.png" 
             alt="AI Assistant" 
             className="w-6 h-6 text-[#1EAEDB] filter brightness-0 invert" 
           />

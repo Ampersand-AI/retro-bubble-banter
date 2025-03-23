@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 interface Message {
   id: number;
@@ -36,8 +37,8 @@ const TokenUsageCard = ({ messages }: TokenUsageCardProps) => {
     return {
       user: lastUserMessage,
       ai: lastAiMessage,
-      userTokens: estimateTokens(lastUserMessage.text),
-      aiTokens: lastAiMessage ? estimateTokens(lastAiMessage.text) : 0,
+      userTokens: lastUserMessage.tokenCount?.input || estimateTokens(lastUserMessage.text),
+      aiTokens: lastAiMessage ? (lastAiMessage.tokenCount?.output || estimateTokens(lastAiMessage.text)) : 0,
     };
   };
   
@@ -45,17 +46,21 @@ const TokenUsageCard = ({ messages }: TokenUsageCardProps) => {
   const getTotalTokenUsage = () => {
     const userTokens = messages
       .filter(m => !m.isAi)
-      .reduce((sum, m) => sum + estimateTokens(m.text), 0);
+      .reduce((sum, m) => sum + (m.tokenCount?.input || estimateTokens(m.text)), 0);
       
     const aiTokens = messages
       .filter(m => m.isAi)
-      .reduce((sum, m) => sum + estimateTokens(m.text), 0);
+      .reduce((sum, m) => sum + (m.tokenCount?.output || estimateTokens(m.text)), 0);
       
     return { userTokens, aiTokens, total: userTokens + aiTokens };
   };
   
   const latestConversation = getLatestConversation();
   const totalUsage = getTotalTokenUsage();
+
+  // For the progress bar, assume a reasonable max token count
+  const maxTokens = 10000;
+  const progressPercentage = Math.min((totalUsage.total / maxTokens) * 100, 100);
   
   return (
     <Card className="w-[250px] h-auto bg-amp-blue border-0 relative overflow-hidden">
@@ -69,6 +74,19 @@ const TokenUsageCard = ({ messages }: TokenUsageCardProps) => {
       
       <CardContent className="text-amp-gray">
         <div className="space-y-6">
+          <div className="space-y-2">
+            <h3 className="text-amp-cyan text-sm font-semibold">Usage Meter</h3>
+            <Progress value={progressPercentage} className="h-2 bg-amp-blue border border-amp-gray">
+              <div 
+                className="h-full bg-gradient-to-r from-green-400 to-blue-500" 
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </Progress>
+            <div className="text-xs text-right text-amp-cyan">
+              {totalUsage.total} / {maxTokens} tokens
+            </div>
+          </div>
+          
           {latestConversation && (
             <div className="space-y-2">
               <h3 className="text-amp-cyan text-sm">Latest Exchange</h3>
