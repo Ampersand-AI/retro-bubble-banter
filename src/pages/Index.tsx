@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
@@ -12,6 +11,10 @@ interface Message {
   id: number;
   text: string;
   isAi: boolean;
+  tokenCount?: {
+    input: number;
+    output: number;
+  };
 }
 
 // Use constants outside the component to improve performance
@@ -30,12 +33,22 @@ const DEFAULT_SUBMODELS = {
 
 const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. You can answer questions about startups, investments, investor decks, deal types, venture capital firms, angel investors, and related topics.";
 
+// Helper function to estimate token count
+const estimateTokens = (text: string): number => {
+  // Rough estimate: ~4 chars per token for English text
+  return Math.ceil(text.length / 4);
+};
+
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
       text: "Hello! I'm Zack AI, your retro-futuristic startup investment assistant. How can I help you today?",
-      isAi: true
+      isAi: true,
+      tokenCount: {
+        input: 0,
+        output: estimateTokens("Hello! I'm Zack AI, your retro-futuristic startup investment assistant. How can I help you today?")
+      }
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
@@ -160,7 +173,11 @@ const Index = () => {
       {
         id: messageIdCounter,
         text: `Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`,
-        isAi: true
+        isAi: true,
+        tokenCount: {
+          input: 0,
+          output: estimateTokens(`Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`)
+        }
       }
     ]);
     setMessageIdCounter(prev => prev + 1);
@@ -190,7 +207,11 @@ const Index = () => {
             {
               id: messageIdCounter + 1,
               text: "I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.",
-              isAi: true
+              isAi: true,
+              tokenCount: {
+                input: estimateTokens(userMessage),
+                output: estimateTokens("I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.")
+              }
             }
           ]);
           setMessageIdCounter(prev => prev + 2);
@@ -218,8 +239,9 @@ const Index = () => {
         ...prevMessages,
         {
           id: messageIdCounter + 1,
-          text: response,
-          isAi: true
+          text: response.text,
+          isAi: true,
+          tokenCount: response.tokenCount
         }
       ]);
       setMessageIdCounter(prev => prev + 2);
@@ -230,14 +252,18 @@ const Index = () => {
         {
           id: messageIdCounter + 1,
           text: "Sorry, I encountered an error while processing your request. Please try again.",
-          isAi: true
+          isAi: true,
+          tokenCount: {
+            input: estimateTokens(userMessage),
+            output: estimateTokens("Sorry, I encountered an error while processing your request. Please try again.")
+          }
         }
       ]);
       setMessageIdCounter(prev => prev + 2);
     } finally {
       setIsTyping(false);
     }
-  }, [selectedModel, selectedSubModel, messageIdCounter]);
+  }, [selectedModel, selectedSubModel, messageIdCounter, fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse]);
 
   const fetchOpenAIResponse = useCallback(async (userMessage: string, subModel: string) => {
     try {
@@ -266,14 +292,34 @@ const Index = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("OpenAI API error:", errorData);
-        return `Error: ${errorData.error?.message || "Unknown error with OpenAI API"}`;
+        return {
+          text: `Error: ${errorData.error?.message || "Unknown error with OpenAI API"}`,
+          tokenCount: {
+            input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+            output: 0
+          }
+        };
       }
       
       const data = await response.json();
-      return data.choices?.[0]?.message?.content || simulateResponse(userMessage);
+      const aiResponse = data.choices?.[0]?.message?.content || simulateResponse(userMessage).text;
+      
+      return {
+        text: aiResponse,
+        tokenCount: {
+          input: data.usage?.prompt_tokens || estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          output: data.usage?.completion_tokens || estimateTokens(aiResponse)
+        }
+      };
     } catch (error) {
       console.error("OpenAI API error:", error);
-      return `Error communicating with OpenAI. Please try again.`;
+      return {
+        text: `Error communicating with OpenAI. Please try again.`,
+        tokenCount: {
+          input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          output: 0
+        }
+      };
     }
   }, []);
 
@@ -305,14 +351,34 @@ const Index = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Claude API error:", errorData);
-        return `Error: ${errorData.error?.message || "Unknown error with Claude API"}`;
+        return {
+          text: `Error: ${errorData.error?.message || "Unknown error with Claude API"}`,
+          tokenCount: {
+            input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+            output: 0
+          }
+        };
       }
       
       const data = await response.json();
-      return data.content?.[0]?.text || simulateResponse(userMessage);
+      const aiResponse = data.content?.[0]?.text || simulateResponse(userMessage).text;
+      
+      return {
+        text: aiResponse,
+        tokenCount: {
+          input: data.usage?.prompt_tokens || estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          output: data.usage?.completion_tokens || estimateTokens(aiResponse)
+        }
+      };
     } catch (error) {
       console.error("Claude API error:", error);
-      return `Error communicating with Claude. Please try again.`;
+      return {
+        text: `Error communicating with Claude. Please try again.`,
+        tokenCount: {
+          input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          output: 0
+        }
+      };
     }
   }, []);
 
@@ -347,14 +413,34 @@ const Index = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Gemini API error:", errorData);
-        return `Error: ${errorData.error?.message || "Unknown error with Gemini API"}`;
+        return {
+          text: `Error: ${errorData.error?.message || "Unknown error with Gemini API"}`,
+          tokenCount: {
+            input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+            output: 0
+          }
+        };
       }
       
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || simulateResponse(userMessage);
+      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || simulateResponse(userMessage).text;
+      
+      return {
+        text: aiResponse,
+        tokenCount: {
+          input: data.usage?.prompt_tokens || estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          output: data.usage?.completion_tokens || estimateTokens(aiResponse)
+        }
+      };
     } catch (error) {
       console.error("Gemini API error:", error);
-      return `Error communicating with Gemini. Please try again.`;
+      return {
+        text: `Error communicating with Gemini. Please try again.`,
+        tokenCount: {
+          input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+          output: 0
+        }
+      };
     }
   }, []);
 
@@ -374,24 +460,113 @@ const Index = () => {
     ];
     
     // Choose a random response
-    return responses[Math.floor(Math.random() * responses.length)];
+    const response = responses[Math.floor(Math.random() * responses.length)];
+    
+    return {
+      text: response,
+      tokenCount: {
+        input: estimateTokens(userMessage) + estimateTokens(STARTUP_SYSTEM_PROMPT),
+        output: estimateTokens(response)
+      }
+    };
   };
 
   const handleSendMessage = useCallback((message: string) => {
     // Add user message
+    const userMessageId = messageIdCounter;
+    const userTokenCount = estimateTokens(message);
+    
     setMessages(prevMessages => [
       ...prevMessages,
       {
-        id: messageIdCounter,
+        id: userMessageId,
         text: message,
-        isAi: false
+        isAi: false,
+        tokenCount: {
+          input: userTokenCount,
+          output: 0
+        }
       }
     ]);
     setMessageIdCounter(prev => prev + 1);
     
+    // Start typing animation
+    setIsTyping(true);
+    
     // Get AI response
-    fetchAIResponse(message);
-  }, [messageIdCounter, fetchAIResponse]);
+    const fetchResponse = async () => {
+      try {
+        let response;
+        
+        if (!isStartupRelated(message)) {
+          // Return a canned response for non-startup related questions
+          setTimeout(() => {
+            const cannedResponse = "I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.";
+            setMessages(prevMessages => [
+              ...prevMessages,
+              {
+                id: userMessageId + 1,
+                text: cannedResponse,
+                isAi: true,
+                tokenCount: {
+                  input: userTokenCount,
+                  output: estimateTokens(cannedResponse)
+                }
+              }
+            ]);
+            setMessageIdCounter(prev => prev + 2);
+            setIsTyping(false);
+          }, 1000);
+          return;
+        }
+        
+        switch (selectedModel) {
+          case 'openai':
+            response = await fetchOpenAIResponse(message, selectedSubModel);
+            break;
+          case 'claude':
+            response = await fetchClaudeResponse(message, selectedSubModel);
+            break;
+          case 'gemini':
+            response = await fetchGeminiResponse(message, selectedSubModel);
+            break;
+          default:
+            // Fallback to simulated response
+            response = simulateResponse(message);
+        }
+        
+        setMessages(prevMessages => [
+          ...prevMessages,
+          {
+            id: userMessageId + 1,
+            text: response.text,
+            isAi: true,
+            tokenCount: response.tokenCount
+          }
+        ]);
+        setMessageIdCounter(prev => prev + 2);
+      } catch (error) {
+        console.error("Error fetching AI response:", error);
+        setMessages(prevMessages => [
+          ...prevMessages,
+          {
+            id: userMessageId + 1,
+            text: "Sorry, I encountered an error while processing your request. Please try again.",
+            isAi: true,
+            tokenCount: {
+              input: userTokenCount,
+              output: estimateTokens("Sorry, I encountered an error while processing your request. Please try again.")
+            }
+          }
+        ]);
+        setMessageIdCounter(prev => prev + 2);
+      } finally {
+        setIsTyping(false);
+      }
+    };
+    
+    fetchResponse();
+  }, [messageIdCounter, selectedModel, selectedSubModel, fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse, isStartupRelated]);
 
   // Sound effects for UI interactions (subtle blips and bloops)
   useEffect(() => {

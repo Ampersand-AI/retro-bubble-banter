@@ -6,9 +6,10 @@ interface MessageBubbleProps {
   message: string;
   isAi: boolean;
   isTyping?: boolean;
+  tokenCount?: number;
 }
 
-const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
+const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubbleProps) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isTypingEffect, setIsTypingEffect] = useState(false);
   const [textComplete, setTextComplete] = useState(false);
@@ -19,11 +20,11 @@ const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
       setDisplayedText('');
       
       let i = 0;
-      const speed = 10; // Faster typing speed (reduced from 30ms to 10ms)
+      const speed = 5; // Even faster typing speed (reduced from 10ms to 5ms)
       
       const typeWriter = () => {
         if (i < message.length) {
-          setDisplayedText(prev => prev + message.charAt(i));
+          setDisplayedText(message.substring(0, i + 1)); // Use substring instead of concatenation
           i++;
           setTimeout(typeWriter, speed);
         } else {
@@ -49,7 +50,7 @@ const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
       {isAi && (
         <div className="w-8 h-8 mr-2 mt-1 bg-amp-blue flex items-center justify-center flex-shrink-0">
           <img 
-            src="/lovable-uploads/ae5d333e-5be0-4b35-bb51-331e1ca052f8.png" 
+            src="/logo.png" 
             alt="AI Assistant" 
             className="w-6 h-6 text-[#1EAEDB] filter brightness-0 invert" 
           />

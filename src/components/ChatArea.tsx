@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
+import TokenUsageCard from './TokenUsageCard';
 import { Clipboard } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +10,10 @@ interface Message {
   id: number;
   text: string;
   isAi: boolean;
+  tokenCount?: {
+    input: number;
+    output: number;
+  };
 }
 
 interface ChatAreaProps {
@@ -36,7 +41,7 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex flex-col h-screen items-center justify-center">
+    <div className="flex flex-row h-screen items-center justify-center gap-6">
       <div className="w-[850px] h-[850px] max-w-[850px] max-h-[850px] overflow-hidden">
         <ScrollArea className="h-full pr-[25px]">
           <div className="px-4 py-4">
@@ -67,6 +72,9 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
           </div>
         </ScrollArea>
       </div>
+      
+      {/* Token Usage Card */}
+      <TokenUsageCard messages={messages} />
     </div>
   );
 };
