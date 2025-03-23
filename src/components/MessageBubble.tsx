@@ -16,7 +16,7 @@ const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
           <img 
             src="/lovable-uploads/ae5d333e-5be0-4b35-bb51-331e1ca052f8.png" 
             alt="AI Assistant" 
-            className="w-6 h-6" 
+            className="w-6 h-6 text-[#1EAEDB] filter brightness-0 invert" 
           />
         </div>
       )}

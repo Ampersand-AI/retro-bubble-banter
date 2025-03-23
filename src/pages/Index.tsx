@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
 import InputSection from '../components/InputSection';
@@ -13,6 +13,7 @@ interface Message {
   isAi: boolean;
 }
 
+// Use constants outside the component to improve performance
 const API_KEYS = {
   openai: "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",
   claude: "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",
@@ -39,18 +40,16 @@ const Index = () => {
   });
   const [showApiStatus, setShowApiStatus] = useState(true);
 
-  // Check API status on load
+  // Check API status on load - optimized with useCallback
   useEffect(() => {
     const validateApis = async () => {
       try {
-        // Test OpenAI API
-        const openaiStatus = await testOpenAIApi();
-        
-        // Test Claude API
-        const claudeStatus = await testClaudeApi();
-        
-        // Test Gemini API
-        const geminiStatus = await testGeminiApi();
+        // Test APIs in parallel for better performance
+        const [openaiStatus, claudeStatus, geminiStatus] = await Promise.all([
+          testOpenAIApi(),
+          testClaudeApi(),
+          testGeminiApi()
+        ]);
         
         setApiStatus({
           openai: openaiStatus,
@@ -71,25 +70,33 @@ const Index = () => {
     validateApis();
   }, []);
 
-  const testOpenAIApi = async (): Promise<boolean> => {
+  // Optimize API test functions with useCallback to prevent unnecessary recreations
+  const testOpenAIApi = useCallback(async (): Promise<boolean> => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
       const response = await fetch('https://api.openai.com/v1/models', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${API_KEYS.openai}`
-        }
+        },
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
       return response.status === 200;
     } catch (error) {
       console.error("OpenAI API test error:", error);
       return false;
     }
-  };
+  }, []);
 
-  const testClaudeApi = async (): Promise<boolean> => {
+  const testClaudeApi = useCallback(async (): Promise<boolean> => {
     try {
-      // For Claude, we'll make a minimal message request to test
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -103,29 +110,35 @@ const Index = () => {
           messages: [
             { role: 'user', content: 'Hi' }
           ]
-        })
+        }),
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
       return response.status === 200;
     } catch (error) {
       console.error("Claude API test error:", error);
       return false;
     }
-  };
+  }, []);
 
-  const testGeminiApi = async (): Promise<boolean> => {
+  const testGeminiApi = useCallback(async (): Promise<boolean> => {
     try {
-      // For Gemini, we'll check if we can access the models endpoint
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
       const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${API_KEYS.gemini}`, {
-        method: 'GET'
+        method: 'GET',
+        signal: controller.signal
       });
       
+      clearTimeout(timeoutId);
       return response.status === 200;
     } catch (error) {
       console.error("Gemini API test error:", error);
       return false;
     }
-  };
+  }, []);
 
   const isStartupRelated = (text: string) => {
     const startupKeywords = [
@@ -160,7 +173,7 @@ const Index = () => {
     setMessageIdCounter(prev => prev + 1);
   };
 
-  const fetchAIResponse = async (userMessage: string) => {
+  const fetchAIResponse = useCallback(async (userMessage: string) => {
     setIsTyping(true);
     
     try {
@@ -221,10 +234,14 @@ const Index = () => {
     } finally {
       setIsTyping(false);
     }
-  };
+  }, [selectedModel, messageIdCounter]);
 
-  const fetchOpenAIResponse = async (userMessage: string) => {
+  // Optimize API fetch functions with AbortController for better performance
+  const fetchOpenAIResponse = useCallback(async (userMessage: string) => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -238,8 +255,11 @@ const Index = () => {
             { role: 'user', content: userMessage }
           ],
           max_tokens: 1000
-        })
+        }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -253,10 +273,13 @@ const Index = () => {
       console.error("OpenAI API error:", error);
       return `Error communicating with OpenAI. Please try again.`;
     }
-  };
+  }, []);
 
-  const fetchClaudeResponse = async (userMessage: string) => {
+  const fetchClaudeResponse = useCallback(async (userMessage: string) => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -271,8 +294,11 @@ const Index = () => {
             { role: 'user', content: userMessage }
           ],
           max_tokens: 1000
-        })
+        }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -286,10 +312,13 @@ const Index = () => {
       console.error("Claude API error:", error);
       return `Error communicating with Claude. Please try again.`;
     }
-  };
+  }, []);
 
-  const fetchGeminiResponse = async (userMessage: string) => {
+  const fetchGeminiResponse = useCallback(async (userMessage: string) => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
       const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEYS.gemini}`, {
         method: 'POST',
         headers: {
@@ -307,8 +336,11 @@ const Index = () => {
           generationConfig: {
             maxOutputTokens: 1000
           }
-        })
+        }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -322,7 +354,7 @@ const Index = () => {
       console.error("Gemini API error:", error);
       return `Error communicating with Gemini. Please try again.`;
     }
-  };
+  }, []);
 
   const simulateResponse = (userMessage: string) => {
     // List of possible startup-related AI responses
@@ -343,7 +375,7 @@ const Index = () => {
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = useCallback((message: string) => {
     // Add user message
     setMessages(prevMessages => [
       ...prevMessages,
@@ -357,7 +389,7 @@ const Index = () => {
     
     // Get AI response
     fetchAIResponse(message);
-  };
+  }, [messageIdCounter, fetchAIResponse]);
 
   // Sound effects for UI interactions (subtle blips and bloops)
   useEffect(() => {
@@ -373,10 +405,17 @@ const Index = () => {
   return (
     <CRTEffect>
       <div className="min-h-screen bg-amp-blue overflow-hidden">
-        <Header selectedModel={selectedModel} onModelChange={handleModelChange} apiStatus={apiStatus} />
+        <Header 
+          selectedModel={selectedModel} 
+          apiStatus={apiStatus} 
+        />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         <ChatArea messages={messages} isTyping={isTyping} />
-        <InputSection onSendMessage={handleSendMessage} />
+        <InputSection 
+          onSendMessage={handleSendMessage} 
+          selectedModel={selectedModel}
+          onModelChange={handleModelChange}
+        />
       </div>
     </CRTEffect>
   );

@@ -6,7 +6,6 @@ import { Progress } from './ui/progress';
 const SystemArtifact = () => {
   const [processingLoad, setProcessingLoad] = useState(70);
   const [neuralSync, setNeuralSync] = useState(35);
-  const [branch] = useState("hb01e5");
   const [id] = useState("7ueza1tgs");
   
   // Animate the processing load between 65-95%
@@ -46,11 +45,6 @@ const SystemArtifact = () => {
           <Progress value={neuralSync} className="h-2 bg-amp-blue w-24" />
           <span>{neuralSync}%</span>
         </div>
-      </div>
-      
-      <div className="text-amp-gray/70">
-        <span className="mr-1">⌥</span>
-        <span>{branch}</span>
       </div>
     </div>
   );

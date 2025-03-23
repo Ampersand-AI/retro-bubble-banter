@@ -16,7 +16,6 @@ const APIStatus = ({ apiStatus }: APIStatusProps) => {
             <span className="capitalize">{api} API:</span>
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full ${status ? 'bg-green-500' : 'bg-red-500'} mr-2`}></div>
-              <span>{status ? 'Connected' : 'Disconnected'}</span>
             </div>
           </div>
         ))}
