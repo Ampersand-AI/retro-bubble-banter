@@ -19,7 +19,7 @@ const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
       setDisplayedText('');
       
       let i = 0;
-      const speed = 30; // Typing speed in milliseconds
+      const speed = 10; // Faster typing speed (reduced from 30ms to 10ms)
       
       const typeWriter = () => {
         if (i < message.length) {

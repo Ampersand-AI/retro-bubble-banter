@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
@@ -20,6 +21,13 @@ const API_KEYS = {
   gemini: "AIzaSyBNEgVxG47UOOOzPuOkVVxrb66aQOaZDFo"
 };
 
+// Default submodels for each AI provider
+const DEFAULT_SUBMODELS = {
+  openai: 'gpt-4o',
+  claude: 'claude-3-opus',
+  gemini: 'gemini-1.5-pro'
+};
+
 const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. You can answer questions about startups, investments, investor decks, deal types, venture capital firms, angel investors, and related topics.";
 
 const Index = () => {
@@ -33,12 +41,18 @@ const Index = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [messageIdCounter, setMessageIdCounter] = useState(2);
   const [selectedModel, setSelectedModel] = useState<AIModel>('openai');
+  const [selectedSubModel, setSelectedSubModel] = useState<string>(DEFAULT_SUBMODELS.openai);
   const [apiStatus, setApiStatus] = useState<{[key in AIModel]: boolean}>({
     openai: false,
     claude: false,
     gemini: false
   });
   const [showApiStatus, setShowApiStatus] = useState(false);
+
+  // Update submodel when the main model changes
+  useEffect(() => {
+    setSelectedSubModel(DEFAULT_SUBMODELS[selectedModel]);
+  }, [selectedModel]);
 
   // Check API status on load - optimized with useCallback
   useEffect(() => {
@@ -140,6 +154,7 @@ const Index = () => {
 
   const handleModelChange = (model: AIModel) => {
     setSelectedModel(model);
+    setSelectedSubModel(DEFAULT_SUBMODELS[model]);
     setMessages(prevMessages => [
       ...prevMessages,
       {
@@ -149,6 +164,16 @@ const Index = () => {
       }
     ]);
     setMessageIdCounter(prev => prev + 1);
+  };
+
+  const handleSubModelChange = (subModel: string) => {
+    setSelectedSubModel(subModel);
+    // Optionally notify the user about the submodel change
+    toast({
+      title: `Model Updated`,
+      description: `Now using ${subModel}`,
+      duration: 2000
+    });
   };
 
   const fetchAIResponse = useCallback(async (userMessage: string) => {
@@ -176,13 +201,13 @@ const Index = () => {
       
       switch (selectedModel) {
         case 'openai':
-          response = await fetchOpenAIResponse(userMessage);
+          response = await fetchOpenAIResponse(userMessage, selectedSubModel);
           break;
         case 'claude':
-          response = await fetchClaudeResponse(userMessage);
+          response = await fetchClaudeResponse(userMessage, selectedSubModel);
           break;
         case 'gemini':
-          response = await fetchGeminiResponse(userMessage);
+          response = await fetchGeminiResponse(userMessage, selectedSubModel);
           break;
         default:
           // Fallback to simulated response
@@ -212,9 +237,9 @@ const Index = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [selectedModel, messageIdCounter]);
+  }, [selectedModel, selectedSubModel, messageIdCounter]);
 
-  const fetchOpenAIResponse = useCallback(async (userMessage: string) => {
+  const fetchOpenAIResponse = useCallback(async (userMessage: string, subModel: string) => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
@@ -226,7 +251,7 @@ const Index = () => {
           'Authorization': `Bearer ${API_KEYS.openai}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: subModel || 'gpt-4o-mini',
           messages: [
             { role: 'system', content: STARTUP_SYSTEM_PROMPT },
             { role: 'user', content: userMessage }
@@ -252,7 +277,7 @@ const Index = () => {
     }
   }, []);
 
-  const fetchClaudeResponse = useCallback(async (userMessage: string) => {
+  const fetchClaudeResponse = useCallback(async (userMessage: string, subModel: string) => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
@@ -265,7 +290,7 @@ const Index = () => {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-3-haiku-20240307',
+          model: subModel || 'claude-3-haiku-20240307',
           messages: [
             { role: 'system', content: STARTUP_SYSTEM_PROMPT },
             { role: 'user', content: userMessage }
@@ -291,12 +316,12 @@ const Index = () => {
     }
   }, []);
 
-  const fetchGeminiResponse = useCallback(async (userMessage: string) => {
+  const fetchGeminiResponse = useCallback(async (userMessage: string, subModel: string) => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEYS.gemini}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${subModel || 'gemini-1.5-flash'}:generateContent?key=${API_KEYS.gemini}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -389,7 +414,12 @@ const Index = () => {
         />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         <ChatArea messages={messages} isTyping={isTyping} />
-        <InputSection onSendMessage={handleSendMessage} />
+        <InputSection 
+          onSendMessage={handleSendMessage} 
+          selectedModel={selectedModel}
+          selectedSubModel={selectedSubModel}
+          onSubModelChange={handleSubModelChange}
+        />
       </div>
     </CRTEffect>
   );

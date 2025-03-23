@@ -37,32 +37,34 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
 
   return (
     <div className="flex flex-col h-screen items-center justify-center">
-      <div className="w-[650px] h-[650px] max-w-[650px] max-h-[650px] overflow-hidden">
-        <ScrollArea className="h-full px-4 py-4">
-          {messages.map((message) => (
-            <div key={message.id} className="relative group">
+      <div className="w-[850px] h-[850px] max-w-[850px] max-h-[850px] overflow-hidden">
+        <ScrollArea className="h-full pr-[25px]">
+          <div className="px-4 py-4">
+            {messages.map((message) => (
+              <div key={message.id} className="relative group">
+                <MessageBubble
+                  message={message.text}
+                  isAi={message.isAi}
+                />
+                {message.isAi && (
+                  <button 
+                    onClick={() => copyMessage(message.text)}
+                    className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity text-amp-cyan hover:text-amp-gray"
+                  >
+                    <Clipboard size={16} />
+                  </button>
+                )}
+              </div>
+            ))}
+            {isTyping && (
               <MessageBubble
-                message={message.text}
-                isAi={message.isAi}
+                message=""
+                isAi={true}
+                isTyping={true}
               />
-              {message.isAi && (
-                <button 
-                  onClick={() => copyMessage(message.text)}
-                  className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity text-amp-cyan hover:text-amp-gray"
-                >
-                  <Clipboard size={16} />
-                </button>
-              )}
-            </div>
-          ))}
-          {isTyping && (
-            <MessageBubble
-              message=""
-              isAi={true}
-              isTyping={true}
-            />
-          )}
-          <div ref={chatEndRef} />
+            )}
+            <div ref={chatEndRef} />
+          </div>
         </ScrollArea>
       </div>
     </div>

@@ -1,12 +1,17 @@
 
 import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { Send, Mic, Paperclip } from 'lucide-react';
+import ModelDropdown from './ModelDropdown';
+import { AIModel } from './ModelSelect';
 
 interface InputSectionProps {
   onSendMessage: (message: string) => void;
+  selectedModel: AIModel;
+  selectedSubModel: string;
+  onSubModelChange: (subModel: string) => void;
 }
 
-const InputSection = ({ onSendMessage }: InputSectionProps) => {
+const InputSection = ({ onSendMessage, selectedModel, selectedSubModel, onSubModelChange }: InputSectionProps) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -103,7 +108,7 @@ const InputSection = ({ onSendMessage }: InputSectionProps) => {
 
   return (
     <div className="fixed bottom-8 left-0 right-0 flex justify-center">
-      <div className="w-[650px] max-w-[650px] flex items-center">
+      <div className="w-[850px] max-w-[850px] flex items-center">
         <div className="flex items-center space-x-3 mr-3">
           <Mic 
             className={`w-6 h-6 ${isRecording ? 'text-amp-cyan' : 'text-amp-gray'} hover:text-amp-cyan cursor-pointer transition-colors`}
@@ -136,10 +141,15 @@ const InputSection = ({ onSendMessage }: InputSectionProps) => {
           />
         </div>
         
-        <div className="flex items-center">
+        <div className="flex items-center gap-3">
+          <ModelDropdown 
+            selectedModel={selectedModel}
+            selectedSubModel={selectedSubModel}
+            onSubModelChange={onSubModelChange}
+          />
           <button 
             onClick={handleSend}
-            className="ml-3 py-2 px-3 h-[40px] w-[40px] flex items-center justify-center bg-transparent"
+            className="ml-1 py-2 px-3 h-[40px] w-[40px] flex items-center justify-center bg-transparent"
             disabled={!message.trim()}
           >
             <Send className="w-5 h-5 text-amp-cyan" />
