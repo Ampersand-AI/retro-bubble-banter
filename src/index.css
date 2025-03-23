@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap');
 
 @tailwind base;
@@ -61,20 +62,20 @@
 
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 16px;
+    width: 3px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-amp-blue border-2 border-amp-gray/30;
+    @apply bg-amp-blue;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-amp-gray border-2 border-amp-cyan;
+    @apply bg-green-500;
     image-rendering: pixelated;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-amp-cyan;
+    @apply bg-green-600;
   }
 
   /* Blinking cursor */
@@ -89,6 +90,11 @@
   @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+  }
+
+  /* Green progress bars */
+  .green-progress .green-progress-indicator {
+    @apply bg-green-500;
   }
 }
 

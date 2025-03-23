@@ -1,15 +1,12 @@
 
 import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { Send, Mic, Paperclip } from 'lucide-react';
-import ModelSelect, { AIModel } from './ModelSelect';
 
 interface InputSectionProps {
   onSendMessage: (message: string) => void;
-  selectedModel: AIModel;
-  onModelChange: (model: AIModel) => void;
 }
 
-const InputSection = ({ onSendMessage, selectedModel, onModelChange }: InputSectionProps) => {
+const InputSection = ({ onSendMessage }: InputSectionProps) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -106,7 +103,7 @@ const InputSection = ({ onSendMessage, selectedModel, onModelChange }: InputSect
 
   return (
     <div className="fixed bottom-8 left-0 right-0 flex justify-center">
-      <div className="w-[500px] max-w-[500px] flex items-center">
+      <div className="w-[650px] max-w-[650px] flex items-center">
         <div className="flex items-center space-x-3 mr-3">
           <Mic 
             className={`w-6 h-6 ${isRecording ? 'text-amp-cyan' : 'text-amp-gray'} hover:text-amp-cyan cursor-pointer transition-colors`}
@@ -131,16 +128,15 @@ const InputSection = ({ onSendMessage, selectedModel, onModelChange }: InputSect
             value={message}
             onChange={(e) => {
               setMessage(e.target.value);
-              setIsTyping(true);
+              setIsTyping(e.target.value.length > 0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder=""
+            placeholder="Type your message..."
             className={`w-full bg-transparent p-2 outline-none font-mono text-amp-gray placeholder:text-amp-dark-gray caret-amp-cyan caret-[4px] ${!isTyping ? 'animate-blink' : ''}`}
           />
         </div>
         
         <div className="flex items-center">
-          <ModelSelect selectedModel={selectedModel} onModelChange={onModelChange} />
           <button 
             onClick={handleSend}
             className="ml-3 py-2 px-3 h-[40px] w-[40px] flex items-center justify-center bg-transparent"

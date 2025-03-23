@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import { Clipboard } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
   id: number;
@@ -16,7 +17,6 @@ interface ChatAreaProps {
 }
 
 const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when messages update
@@ -37,8 +37,8 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
 
   return (
     <div className="flex flex-col h-screen items-center justify-center">
-      <div className="w-[500px] h-[500px] max-w-[500px] max-h-[500px] overflow-hidden" ref={scrollContainerRef}>
-        <div className="mx-auto py-4 h-full overflow-y-auto px-4">
+      <div className="w-[650px] h-[650px] max-w-[650px] max-h-[650px] overflow-hidden">
+        <ScrollArea className="h-full px-4 py-4">
           {messages.map((message) => (
             <div key={message.id} className="relative group">
               <MessageBubble
@@ -63,7 +63,7 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
             />
           )}
           <div ref={chatEndRef} />
-        </div>
+        </ScrollArea>
       </div>
     </div>
   );

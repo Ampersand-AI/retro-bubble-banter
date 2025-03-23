@@ -38,7 +38,7 @@ const Index = () => {
     claude: false,
     gemini: false
   });
-  const [showApiStatus, setShowApiStatus] = useState(true);
+  const [showApiStatus, setShowApiStatus] = useState(false);
 
   // Check API status on load - optimized with useCallback
   useEffect(() => {
@@ -56,12 +56,6 @@ const Index = () => {
           claude: claudeStatus,
           gemini: geminiStatus
         });
-        
-        // Show API status component for 5 seconds
-        setTimeout(() => {
-          setShowApiStatus(false);
-        }, 5000);
-        
       } catch (error) {
         console.error("Error validating APIs:", error);
       }
@@ -70,7 +64,6 @@ const Index = () => {
     validateApis();
   }, []);
 
-  // Optimize API test functions with useCallback to prevent unnecessary recreations
   const testOpenAIApi = useCallback(async (): Promise<boolean> => {
     try {
       const controller = new AbortController();
@@ -141,21 +134,6 @@ const Index = () => {
   }, []);
 
   const isStartupRelated = (text: string) => {
-    const startupKeywords = [
-      'startup', 'investor', 'investment', 'funding', 'venture', 'capital', 
-      'angel', 'seed', 'series', 'exit', 'acquisition', 'ipo', 'incubator', 
-      'accelerator', 'founder', 'ceo', 'entrepreneur', 'business', 'valuation',
-      'pitch', 'deck', 'term sheet', 'cap table', 'equity', 'shares', 'stock',
-      'option', 'vesting', 'board', 'director', 'revenue', 'profit', 'scale',
-      'growth', 'market', 'product', 'mvp', 'saas', 'b2b', 'b2c', 'customer',
-      'deal', 'type', 'vc', 'venture capital', 'search', 'top', 'best', 'firm',
-      'portfolio', 'strategy', 'due diligence', 'return', 'roi', 'multiple',
-      'unicorn', 'decacorn', 'bootstrap', 'crowdfunding', 'pre-seed', 'mezzanine',
-      'bridge', 'round', 'convertible', 'note', 'safe', 'dilution', 'liquidation',
-      'preference', 'pro-rata', 'drag-along', 'tag-along', 'first-look', 'exclusivity',
-      'a16z', 'sequoia', 'benchmark', 'y combinator', 'techstars', '500 startups'
-    ];
-
     // Always return true now - we've expanded our knowledge base
     return true;
   };
@@ -236,7 +214,6 @@ const Index = () => {
     }
   }, [selectedModel, messageIdCounter]);
 
-  // Optimize API fetch functions with AbortController for better performance
   const fetchOpenAIResponse = useCallback(async (userMessage: string) => {
     try {
       const controller = new AbortController();
@@ -407,15 +384,12 @@ const Index = () => {
       <div className="min-h-screen bg-amp-blue overflow-hidden">
         <Header 
           selectedModel={selectedModel} 
+          onModelChange={handleModelChange}
           apiStatus={apiStatus} 
         />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         <ChatArea messages={messages} isTyping={isTyping} />
-        <InputSection 
-          onSendMessage={handleSendMessage} 
-          selectedModel={selectedModel}
-          onModelChange={handleModelChange}
-        />
+        <InputSection onSendMessage={handleSendMessage} />
       </div>
     </CRTEffect>
   );

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import TypingIndicator from './TypingIndicator';
 
 interface MessageBubbleProps {
@@ -9,6 +9,41 @@ interface MessageBubbleProps {
 }
 
 const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTypingEffect, setIsTypingEffect] = useState(false);
+  const [textComplete, setTextComplete] = useState(false);
+  
+  useEffect(() => {
+    if (isAi && message && !isTyping && !textComplete) {
+      setIsTypingEffect(true);
+      setDisplayedText('');
+      
+      let i = 0;
+      const speed = 30; // Typing speed in milliseconds
+      
+      const typeWriter = () => {
+        if (i < message.length) {
+          setDisplayedText(prev => prev + message.charAt(i));
+          i++;
+          setTimeout(typeWriter, speed);
+        } else {
+          setIsTypingEffect(false);
+          setTextComplete(true);
+        }
+      };
+      
+      typeWriter();
+    } else if (!isAi) {
+      setDisplayedText(message);
+      setTextComplete(true);
+    }
+    
+    return () => {
+      setIsTypingEffect(false);
+      setTextComplete(false);
+    };
+  }, [message, isAi, isTyping]);
+
   return (
     <div className={`flex items-start mb-4 animate-fade-in-up ${isAi ? 'justify-start' : 'justify-end'}`}>
       {isAi && (
@@ -27,7 +62,16 @@ const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
             : 'bg-transparent text-amp-gray'
         } p-3 max-w-[75%] break-words`}
       >
-        {isTyping ? <TypingIndicator /> : message}
+        {isTyping ? (
+          <TypingIndicator />
+        ) : isAi && isTypingEffect ? (
+          <>
+            {displayedText}
+            <span className="inline-block w-1 h-4 bg-amp-cyan ml-1 animate-blink"></span>
+          </>
+        ) : (
+          displayedText || message
+        )}
       </div>
     </div>
   );
