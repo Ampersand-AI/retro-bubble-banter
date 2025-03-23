@@ -55,7 +55,7 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
           <img 
             src="/lovable-uploads/d8aff0f2-6bde-4839-8047-d0aa14601210.png" 
             alt="AI Assistant" 
-            className="w-6 h-6 filter brightness-0 saturate-100 invert-0 sepia-0 drop-shadow-none hue-rotate-100" 
+            className="w-6 h-6 filter brightness-100 saturate-100 hue-rotate-60" 
           />
         </div>
       )}

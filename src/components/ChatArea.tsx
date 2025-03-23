@@ -40,8 +40,8 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex justify-center h-screen pb-16">
-      <div className="w-[850px] max-w-[850px] max-h-[850px] overflow-hidden">
+    <div className="flex justify-center items-center h-[calc(100vh-4rem)] pt-16">
+      <div className="w-[750px] h-[750px] max-w-[750px] max-h-[750px] overflow-hidden">
         <ScrollArea className="h-full pr-[25px]">
           <div className="px-4 py-4">
             {messages.map((message) => (

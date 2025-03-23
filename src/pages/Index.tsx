@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
@@ -535,7 +534,8 @@ const Index = () => {
         <Header 
           selectedModel={selectedModel} 
           onModelChange={handleModelChange}
-          apiStatus={apiStatus} 
+          apiStatus={apiStatus}
+          messages={messages}
         />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         <ChatArea messages={messages} isTyping={isTyping} />
