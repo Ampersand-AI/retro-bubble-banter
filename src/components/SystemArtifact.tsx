@@ -47,7 +47,7 @@ const SystemArtifact = () => {
       
       <div className="flex-1 min-w-[100px]">
         <div className="flex justify-between mb-1">
-          <span>Sync:</span>
+          <span>Neural Sync:</span>
           <span>{neuralSync}%</span>
         </div>
         <Progress 
