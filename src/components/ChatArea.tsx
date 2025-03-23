@@ -37,8 +37,8 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
 
   return (
     <div className="flex flex-col h-screen items-center justify-center">
-      <div className="w-[650px] h-[550px] max-w-[650px] max-h-[650px] overflow-hidden" ref={scrollContainerRef}>
-        <div className="mx-auto py-4 h-full overflow-y-auto px-4 custom-scrollbar">
+      <div className="w-[500px] h-[500px] max-w-[500px] max-h-[500px] overflow-hidden" ref={scrollContainerRef}>
+        <div className="mx-auto py-4 h-full overflow-y-auto px-4">
           {messages.map((message) => (
             <div key={message.id} className="relative group">
               <MessageBubble

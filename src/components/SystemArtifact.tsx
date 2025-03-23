@@ -6,6 +6,7 @@ import { Progress } from './ui/progress';
 const SystemArtifact = () => {
   const [processingLoad, setProcessingLoad] = useState(70);
   const [neuralSync, setNeuralSync] = useState(35);
+  const [id] = useState("7ueza1tgs");
   
   // Animate the processing load between 65-95%
   useEffect(() => {
@@ -29,6 +30,7 @@ const SystemArtifact = () => {
     <div className="flex items-center space-x-4 bg-[#1a1c21] text-amp-cyan p-2 text-xs font-mono mr-4">
       <div className="flex items-center">
         <Cpu className="w-4 h-4 mr-2" />
+        <span className="mr-2">ID: {id}</span>
       </div>
       
       <div className="flex items-center space-x-4">
@@ -39,9 +41,9 @@ const SystemArtifact = () => {
         </div>
         
         <div className="flex items-center space-x-2">
-          <span className="text-green-500">Neural Sync:</span>
-          <Progress value={neuralSync} className="h-2 bg-amp-blue w-24 [&>div]:bg-green-500" />
-          <span className="text-green-500">{neuralSync}%</span>
+          <span>Neural Sync:</span>
+          <Progress value={neuralSync} className="h-2 bg-amp-blue w-24" />
+          <span>{neuralSync}%</span>
         </div>
       </div>
     </div>

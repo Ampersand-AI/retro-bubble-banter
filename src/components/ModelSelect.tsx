@@ -1,5 +1,12 @@
 
 import React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 export type AIModel = 'openai' | 'claude' | 'gemini';
 
@@ -10,21 +17,19 @@ interface ModelSelectProps {
 
 const ModelSelect = ({ selectedModel, onModelChange }: ModelSelectProps) => {
   return (
-    <div className="flex space-x-2">
-      {['openai', 'claude', 'gemini'].map((model) => (
-        <button
-          key={model}
-          onClick={() => onModelChange(model as AIModel)}
-          className={`px-3 py-1 text-xs border rounded transition-colors ${
-            selectedModel === model 
-              ? 'border-amp-cyan text-amp-cyan bg-transparent' 
-              : 'border-amp-gray text-amp-gray bg-transparent hover:border-amp-cyan hover:text-amp-cyan'
-          }`}
-        >
-          {model.charAt(0).toUpperCase() + model.slice(1)}
-        </button>
-      ))}
-    </div>
+    <Select
+      value={selectedModel}
+      onValueChange={(value: AIModel) => onModelChange(value)}
+    >
+      <SelectTrigger className="w-[140px] bg-amp-blue border-amp-gray text-amp-cyan font-pixel text-xs">
+        <SelectValue placeholder="Select Model" />
+      </SelectTrigger>
+      <SelectContent className="bg-amp-blue border-amp-gray text-amp-cyan font-pixel">
+        <SelectItem value="openai" className="text-xs hover:bg-amp-gray/20">OpenAI</SelectItem>
+        <SelectItem value="claude" className="text-xs hover:bg-amp-gray/20">Claude</SelectItem>
+        <SelectItem value="gemini" className="text-xs hover:bg-amp-gray/20">Gemini</SelectItem>
+      </SelectContent>
+    </Select>
   );
 };
 
