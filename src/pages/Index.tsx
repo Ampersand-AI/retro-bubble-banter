@@ -20,7 +20,7 @@ const API_KEYS = {
   gemini: "AIzaSyBNEgVxG47UOOOzPuOkVVxrb66aQOaZDFo"
 };
 
-const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. You can answer questions about startups, investments, investor decks, deal types, venture capital firms, angel investors, and related topics.";
+const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. You can answer questions about startups, investments, investor decks, deal types, venture capital firms, angel investors, and related topics. Format your responses with proper spacing and bullet points when appropriate.";
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -141,6 +141,7 @@ const Index = () => {
   }, []);
 
   const isStartupRelated = (text: string) => {
+    // Expanded keywords for more flexible matching
     const startupKeywords = [
       'startup', 'investor', 'investment', 'funding', 'venture', 'capital', 
       'angel', 'seed', 'series', 'exit', 'acquisition', 'ipo', 'incubator', 
@@ -236,7 +237,6 @@ const Index = () => {
     }
   }, [selectedModel, messageIdCounter]);
 
-  // Optimize API fetch functions with AbortController for better performance
   const fetchOpenAIResponse = useCallback(async (userMessage: string) => {
     try {
       const controller = new AbortController();
@@ -391,31 +391,22 @@ const Index = () => {
     fetchAIResponse(message);
   }, [messageIdCounter, fetchAIResponse]);
 
-  // Sound effects for UI interactions (subtle blips and bloops)
-  useEffect(() => {
-    const handleClick = () => {
-      // This would play a sound effect in a full implementation
-      console.log("Click sound effect would play here");
-    };
-
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, []);
-
   return (
     <CRTEffect>
-      <div className="min-h-screen bg-amp-blue overflow-hidden">
-        <Header 
-          selectedModel={selectedModel} 
-          apiStatus={apiStatus} 
-        />
-        {showApiStatus && <APIStatus apiStatus={apiStatus} />}
-        <ChatArea messages={messages} isTyping={isTyping} />
-        <InputSection 
-          onSendMessage={handleSendMessage} 
-          selectedModel={selectedModel}
-          onModelChange={handleModelChange}
-        />
+      <div className="min-h-screen bg-amp-blue overflow-hidden flex flex-col items-center">
+        <div className="w-[650px] h-[650px] flex flex-col">
+          <Header 
+            selectedModel={selectedModel} 
+            apiStatus={apiStatus} 
+          />
+          {showApiStatus && <APIStatus apiStatus={apiStatus} />}
+          <ChatArea messages={messages} isTyping={isTyping} />
+          <InputSection 
+            onSendMessage={handleSendMessage} 
+            selectedModel={selectedModel}
+            onModelChange={handleModelChange}
+          />
+        </div>
       </div>
     </CRTEffect>
   );

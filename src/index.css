@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap');
 
 @tailwind base;
@@ -59,7 +60,29 @@
     image-rendering: pixelated;
   }
 
-  /* Custom Scrollbar */
+  /* Custom Green Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-amp-blue;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-green-500;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-green-600;
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.green.500') theme('colors.amp-blue');
+  }
+
+  /* Original Scrollbar */
   ::-webkit-scrollbar {
     width: 16px;
   }
