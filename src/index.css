@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,58 +38,15 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
-  }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --pixel-size: 2px;
   }
 }
 
@@ -96,6 +56,92 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-amp-blue text-amp-gray font-mono antialiased;
+    image-rendering: pixelated;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 16px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-amp-blue border-2 border-amp-gray/30;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-amp-gray border-2 border-amp-cyan;
+    image-rendering: pixelated;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-amp-cyan;
+  }
+}
+
+@layer components {
+  .crt-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crt-effect::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      transparent 0px,
+      rgba(0, 0, 0, 0.05) 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .crt-effect::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background: linear-gradient(
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(0, 0, 0, 0.1) 50%
+    );
+    background-size: 100% 4px;
+    opacity: 0.15;
+    pointer-events: none;
+    animation: scanline 8s linear infinite;
+    z-index: 9;
+  }
+
+  .pixel-shadow {
+    box-shadow: var(--pixel-size) var(--pixel-size) 0 rgba(0, 0, 0, 0.5);
+  }
+
+  .pixel-border {
+    position: relative;
+    border: var(--pixel-size) solid;
+    image-rendering: pixelated;
+  }
+  
+  .pixel-border-2 {
+    border-width: calc(var(--pixel-size) * 2);
+  }
+
+  .pixel-button {
+    @apply font-pixel py-2 px-4 transition duration-200 transform border-2 bg-amp-blue text-amp-cyan border-amp-cyan;
+  }
+
+  .pixel-button:hover {
+    @apply -translate-y-1 bg-amp-cyan text-amp-blue border-amp-gray pixel-shadow;
+  }
+
+  .pixel-button:active {
+    @apply translate-y-0 transform-none shadow-none;
   }
 }
