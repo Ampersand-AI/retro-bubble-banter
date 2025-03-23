@@ -29,9 +29,9 @@ const Header = ({ selectedModel, onModelChange, apiStatus }: HeaderProps) => {
           />
           <div className="w-8 h-8 bg-amp-blue flex items-center justify-center ml-4">
             <img 
-              src="/lovable-uploads/1c140dbc-d493-42f7-ac2a-723f1a7e0b63.png" 
+              src="/lovable-uploads/d8aff0f2-6bde-4839-8047-d0aa14601210.png" 
               alt="Zack AI Logo" 
-              className="w-6 h-6 text-amp-blue" 
+              className="w-6 h-6 filter brightness-0 saturate-100 invert-0 sepia-0 drop-shadow-none hue-rotate-100"
             />
           </div>
         </div>

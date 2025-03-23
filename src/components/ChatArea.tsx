@@ -1,7 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
-import TokenUsageCard from './TokenUsageCard';
 import { Clipboard } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -41,8 +40,8 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex flex-row h-screen items-end justify-center gap-6 pb-16">
-      <div className="w-[850px] h-[850px] max-w-[850px] max-h-[850px] overflow-hidden">
+    <div className="flex justify-center h-screen pb-16">
+      <div className="w-[850px] max-w-[850px] max-h-[850px] overflow-hidden">
         <ScrollArea className="h-full pr-[25px]">
           <div className="px-4 py-4">
             {messages.map((message) => (
@@ -50,6 +49,7 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
                 <MessageBubble
                   message={message.text}
                   isAi={message.isAi}
+                  tokenCount={message.tokenCount}
                 />
                 {message.isAi && (
                   <button 
@@ -72,9 +72,6 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
           </div>
         </ScrollArea>
       </div>
-      
-      {/* Token Usage Card */}
-      <TokenUsageCard messages={messages} />
     </div>
   );
 };

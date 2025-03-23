@@ -6,7 +6,10 @@ interface MessageBubbleProps {
   message: string;
   isAi: boolean;
   isTyping?: boolean;
-  tokenCount?: number;
+  tokenCount?: {
+    input: number;
+    output: number;
+  };
 }
 
 const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubbleProps) => {
@@ -50,9 +53,9 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
       {isAi && (
         <div className="w-8 h-8 mr-2 mt-1 bg-amp-blue flex items-center justify-center flex-shrink-0">
           <img 
-            src="/lovable-uploads/1c140dbc-d493-42f7-ac2a-723f1a7e0b63.png" 
+            src="/lovable-uploads/d8aff0f2-6bde-4839-8047-d0aa14601210.png" 
             alt="AI Assistant" 
-            className="w-6 h-6 text-[#1EAEDB] filter brightness-0 invert" 
+            className="w-6 h-6 filter brightness-0 saturate-100 invert-0 sepia-0 drop-shadow-none hue-rotate-100" 
           />
         </div>
       )}
@@ -71,7 +74,16 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
             <span className="inline-block w-1 h-4 bg-amp-cyan ml-1 animate-blink"></span>
           </>
         ) : (
-          displayedText || message
+          <>
+            {displayedText || message}
+            {tokenCount && !isTyping && (
+              <div className="text-xs mt-2">
+                <span className="text-red-500">Input: {tokenCount.input} tokens</span>
+                {' | '}
+                <span className="text-orange-500">Output: {tokenCount.output} tokens</span>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
