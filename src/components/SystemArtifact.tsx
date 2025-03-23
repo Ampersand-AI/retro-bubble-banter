@@ -28,18 +28,15 @@ const SystemArtifact = () => {
   }, []);
   
   return (
-    <div className="pixel-border border-amp-cyan bg-[#1a1c21] text-amp-cyan p-2 text-xs font-mono w-[300px] mr-4">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center">
-          <Cpu className="w-4 h-4 mr-2" />
-          <span>System Artifact</span>
-        </div>
-        <div>ID: {id}</div>
+    <div className="flex items-center space-x-4 pixel-border border-amp-cyan bg-[#1a1c21] text-amp-cyan p-2 text-xs font-mono mr-4">
+      <div className="flex items-center">
+        <Cpu className="w-4 h-4 mr-2" />
+        <span className="mr-2">ID: {id}</span>
       </div>
       
-      <div className="mb-2">
+      <div className="flex-1 min-w-[100px]">
         <div className="flex justify-between mb-1">
-          <span>Processing Load:</span>
+          <span>Load:</span>
           <span>{processingLoad}%</span>
         </div>
         <Progress 
@@ -48,9 +45,9 @@ const SystemArtifact = () => {
         />
       </div>
       
-      <div className="mb-2">
+      <div className="flex-1 min-w-[100px]">
         <div className="flex justify-between mb-1">
-          <span>Neural Sync:</span>
+          <span>Sync:</span>
           <span>{neuralSync}%</span>
         </div>
         <Progress 
@@ -60,8 +57,8 @@ const SystemArtifact = () => {
       </div>
       
       <div className="text-amp-gray/70">
-        <span className="mr-2">⌥</span>
-        <span>Branch: {branch}</span>
+        <span className="mr-1">⌥</span>
+        <span>{branch}</span>
       </div>
     </div>
   );
