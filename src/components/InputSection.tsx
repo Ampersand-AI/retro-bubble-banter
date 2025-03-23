@@ -111,11 +111,11 @@ const InputSection = ({ onSendMessage, selectedModel, selectedSubModel, onSubMod
       <div className="w-[850px] max-w-[850px] flex items-center">
         <div className="flex items-center space-x-3 mr-3">
           <Mic 
-            className={`w-6 h-6 ${isRecording ? 'text-amp-cyan' : 'text-amp-gray'} hover:text-amp-cyan cursor-pointer transition-colors`}
+            className={`w-6 h-6 ${isRecording ? 'text-blue-500' : 'text-blue-400'} hover:text-blue-600 cursor-pointer transition-colors`}
             onClick={handleVoiceToText}
           />
           <Paperclip 
-            className="w-6 h-6 text-amp-gray hover:text-amp-cyan cursor-pointer transition-colors"
+            className="w-6 h-6 text-blue-400 hover:text-blue-600 cursor-pointer transition-colors"
             onClick={handleAttachment}
           />
           <input 
@@ -137,16 +137,11 @@ const InputSection = ({ onSendMessage, selectedModel, selectedSubModel, onSubMod
             }}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
-            className={`w-full bg-transparent p-2 outline-none font-mono text-amp-gray placeholder:text-amp-dark-gray caret-amp-cyan caret-[4px] ${!isTyping ? 'animate-blink' : ''}`}
+            className={`w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray caret-green-500 caret-[4px] ${!isTyping ? 'animate-blink' : ''}`}
           />
         </div>
         
         <div className="flex items-center gap-3">
-          <ModelDropdown 
-            selectedModel={selectedModel}
-            selectedSubModel={selectedSubModel}
-            onSubModelChange={onSubModelChange}
-          />
           <button 
             onClick={handleSend}
             className="ml-1 py-2 px-3 h-[40px] w-[40px] flex items-center justify-center bg-transparent"
@@ -154,6 +149,11 @@ const InputSection = ({ onSendMessage, selectedModel, selectedSubModel, onSubMod
           >
             <Send className="w-5 h-5 text-amp-cyan" />
           </button>
+          <ModelDropdown 
+            selectedModel={selectedModel}
+            selectedSubModel={selectedSubModel}
+            onSubModelChange={onSubModelChange}
+          />
         </div>
       </div>
     </div>

@@ -46,7 +46,7 @@ const Header = ({ selectedModel, onModelChange, apiStatus, messages }: HeaderPro
             <img 
               src="/lovable-uploads/d8aff0f2-6bde-4839-8047-d0aa14601210.png" 
               alt="Zack AI Logo" 
-              className="w-6 h-6 filter brightness-100 saturate-100 hue-rotate-60"
+              className="w-6 h-6 filter brightness-100 saturate-150 hue-rotate-[290deg]"
             />
           </button>
         </div>

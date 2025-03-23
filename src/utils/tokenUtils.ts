@@ -7,8 +7,43 @@ export const estimateTokens = (text: string): number => {
   return Math.ceil(text.length / 4);
 };
 
+// Function to check if the user is asking about model identity
+export const checkModelIdentityQuestion = (text: string): boolean => {
+  const identityQuestions = [
+    /which (ai|model|llm)/i,
+    /what (ai|model|llm)/i,
+    /who are you/i,
+    /what's your name/i,
+    /what is your name/i,
+    /are you (claude|openai|gemini|gpt|bard|anthropic)/i,
+    /which version/i,
+    /made by (anthropic|google|openai)/i,
+    /developed by/i,
+    /created by/i
+  ];
+  
+  return identityQuestions.some(regex => regex.test(text));
+};
+
+// Get standardized identity response
+export const getIdentityResponse = (): string => {
+  return "I am Zack AI by Ampersand. I'm here to assist you with any questions or tasks you might have.";
+};
+
 // Simulated AI response for when real APIs are unavailable
 export const simulateResponse = (userMessage: string) => {
+  // Check if user is asking about model identity
+  if (checkModelIdentityQuestion(userMessage)) {
+    const response = getIdentityResponse();
+    return {
+      text: response,
+      tokenCount: {
+        input: estimateTokens(userMessage),
+        output: estimateTokens(response)
+      }
+    };
+  }
+  
   // List of possible startup-related AI responses
   const responses = [
     "Based on current market trends, startups in this sector typically raise between $1-3M for their seed round.",

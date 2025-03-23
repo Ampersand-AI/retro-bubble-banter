@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { Message, AIModel } from '../config/apiConfig';
-import { estimateTokens } from '../utils/tokenUtils';
+import { estimateTokens, checkModelIdentityQuestion, getIdentityResponse } from '../utils/tokenUtils';
 import { fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse } from '../services/apiService';
 
 export const useMessages = () => {
@@ -65,6 +65,28 @@ export const useMessages = () => {
     setIsTyping(true);
     
     try {
+      // Check if this is an identity question and override with standard response
+      if (checkModelIdentityQuestion(message)) {
+        const identityResponse = getIdentityResponse();
+        
+        setTimeout(() => {
+          addMessage({
+            id: userMessageId + 1,
+            text: identityResponse,
+            isAi: true,
+            tokenCount: {
+              input: userTokenCount,
+              output: estimateTokens(identityResponse)
+            }
+          });
+          
+          setMessageIdCounter(userMessageId + 2);
+          setIsTyping(false);
+        }, 1000); // Short delay to simulate thinking
+        
+        return;
+      }
+      
       let response;
       
       switch (selectedModel) {
