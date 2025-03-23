@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
 import InputSection from '../components/InputSection';
+import { AIModel } from '../components/ModelSelect';
 
 interface Message {
   id: number;
@@ -10,50 +11,218 @@ interface Message {
   isAi: boolean;
 }
 
+const API_KEYS = {
+  openai: "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",
+  claude: "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",
+  gemini: "AIzaSyBNEgVxG47UOOOzPuOkVVxrb66aQOaZDFo"
+};
+
+const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. Only respond to questions related to these topics. If a user asks about anything unrelated, respond with 'This question is outside my knowledge base. I can only answer questions related to startups, investors, and investment types.'";
+
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello! I'm Amp AI, your retro-futuristic assistant. How can I help you today?",
+      text: "Hello! I'm Amp AI, your retro-futuristic startup investment assistant. How can I help you today?",
       isAi: true
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [messageIdCounter, setMessageIdCounter] = useState(2);
+  const [selectedModel, setSelectedModel] = useState<AIModel>('openai');
 
-  const simulateResponse = (userMessage: string) => {
+  const isStartupRelated = (text: string) => {
+    const startupKeywords = [
+      'startup', 'investor', 'investment', 'funding', 'venture', 'capital', 
+      'angel', 'seed', 'series', 'exit', 'acquisition', 'ipo', 'incubator', 
+      'accelerator', 'founder', 'ceo', 'entrepreneur', 'business', 'valuation',
+      'pitch', 'deck', 'term sheet', 'cap table', 'equity', 'shares', 'stock',
+      'option', 'vesting', 'board', 'director', 'revenue', 'profit', 'scale',
+      'growth', 'market', 'product', 'mvp', 'saas', 'b2b', 'b2c', 'customer'
+    ];
+
+    // Simple check for any startup related keywords
+    return startupKeywords.some(keyword => 
+      text.toLowerCase().includes(keyword.toLowerCase())
+    );
+  };
+
+  const handleModelChange = (model: AIModel) => {
+    setSelectedModel(model);
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {
+        id: messageIdCounter,
+        text: `Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`,
+        isAi: true
+      }
+    ]);
+    setMessageIdCounter(prev => prev + 1);
+  };
+
+  const fetchAIResponse = async (userMessage: string) => {
     setIsTyping(true);
     
-    // List of possible AI responses
-    const responses = [
-      "I've processed your request with my 8-bit logic circuits. How else can I assist you?",
-      "Interesting input! My pixel-based algorithms are working on a solution for you.",
-      "Beep boop! That's a great question. Let me calculate the most optimal response...",
-      "My retro processors are analyzing your request. Is there anything specific you're looking for?",
-      "According to my database, that's a fascinating topic! Would you like to know more?",
-      "I've saved your input to my primitive memory banks. What shall we discuss next?",
-      `"${userMessage}" - I find this intriguing! Let's explore this further.`,
-      "My 8-bit wisdom suggests that we should delve deeper into this subject. What do you think?"
-    ];
-    
-    // Choose a random response
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    
-    // Simulate typing delay (1.5 to 3 seconds)
-    const typingDelay = 1500 + Math.random() * 1500;
-    
-    setTimeout(() => {
+    try {
+      let response;
+      
+      if (!isStartupRelated(userMessage)) {
+        // Return a canned response for non-startup related questions
+        setTimeout(() => {
+          setMessages(prevMessages => [
+            ...prevMessages,
+            {
+              id: messageIdCounter + 1,
+              text: "I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.",
+              isAi: true
+            }
+          ]);
+          setMessageIdCounter(prev => prev + 2);
+          setIsTyping(false);
+        }, 1000);
+        return;
+      }
+      
+      switch (selectedModel) {
+        case 'openai':
+          response = await fetchOpenAIResponse(userMessage);
+          break;
+        case 'claude':
+          response = await fetchClaudeResponse(userMessage);
+          break;
+        case 'gemini':
+          response = await fetchGeminiResponse(userMessage);
+          break;
+        default:
+          // Fallback to simulated response
+          response = simulateResponse(userMessage);
+      }
+      
       setMessages(prevMessages => [
         ...prevMessages,
         {
           id: messageIdCounter + 1,
-          text: randomResponse,
+          text: response,
           isAi: true
         }
       ]);
       setMessageIdCounter(prev => prev + 2);
+    } catch (error) {
+      console.error("Error fetching AI response:", error);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          id: messageIdCounter + 1,
+          text: "Sorry, I encountered an error while processing your request. Please try again.",
+          isAi: true
+        }
+      ]);
+      setMessageIdCounter(prev => prev + 2);
+    } finally {
       setIsTyping(false);
-    }, typingDelay);
+    }
+  };
+
+  const fetchOpenAIResponse = async (userMessage: string) => {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${API_KEYS.openai}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: STARTUP_SYSTEM_PROMPT },
+            { role: 'user', content: userMessage }
+          ],
+          max_tokens: 1000
+        })
+      });
+      
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content || simulateResponse(userMessage);
+    } catch (error) {
+      console.error("OpenAI API error:", error);
+      return simulateResponse(userMessage);
+    }
+  };
+
+  const fetchClaudeResponse = async (userMessage: string) => {
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEYS.claude,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-sonnet-20240229',
+          messages: [
+            { role: 'system', content: STARTUP_SYSTEM_PROMPT },
+            { role: 'user', content: userMessage }
+          ],
+          max_tokens: 1000
+        })
+      });
+      
+      const data = await response.json();
+      return data.content?.[0]?.text || simulateResponse(userMessage);
+    } catch (error) {
+      console.error("Claude API error:", error);
+      return simulateResponse(userMessage);
+    }
+  };
+
+  const fetchGeminiResponse = async (userMessage: string) => {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEYS.gemini}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: STARTUP_SYSTEM_PROMPT },
+                { text: userMessage }
+              ]
+            }
+          ],
+          generationConfig: {
+            maxOutputTokens: 1000
+          }
+        })
+      });
+      
+      const data = await response.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || simulateResponse(userMessage);
+    } catch (error) {
+      console.error("Gemini API error:", error);
+      return simulateResponse(userMessage);
+    }
+  };
+
+  const simulateResponse = (userMessage: string) => {
+    // List of possible startup-related AI responses
+    const responses = [
+      "Based on current market trends, startups in this sector typically raise between $1-3M for their seed round.",
+      "Venture capital firms usually look for startups with a clear path to profitability within 3-5 years.",
+      "For early-stage startups, angel investors often provide capital in exchange for 10-20% equity.",
+      "Series A funding typically ranges from $2M to $15M, depending on the industry and growth potential.",
+      "The average valuation multiple for SaaS startups is currently 6-10x ARR.",
+      "Accelerator programs like Y Combinator take about 7% equity in exchange for mentorship and initial funding.",
+      "Term sheets typically include liquidation preferences, anti-dilution provisions, and board seat allocations.",
+      "For B2B startups, demonstrating a strong CAC to LTV ratio is crucial when pitching to investors.",
+      `Regarding "${userMessage}", many founders overlook the importance of proper cap table management.`,
+      "When structuring equity for early employees, a 4-year vesting schedule with a 1-year cliff is standard practice."
+    ];
+    
+    // Choose a random response
+    return responses[Math.floor(Math.random() * responses.length)];
   };
 
   const handleSendMessage = (message: string) => {
@@ -68,8 +237,8 @@ const Index = () => {
     ]);
     setMessageIdCounter(prev => prev + 1);
     
-    // Simulate AI response
-    simulateResponse(message);
+    // Get AI response
+    fetchAIResponse(message);
   };
 
   // Sound effects for UI interactions (subtle blips and bloops)
@@ -85,7 +254,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-amp-blue overflow-hidden">
-      <Header />
+      <Header selectedModel={selectedModel} onModelChange={handleModelChange} />
       <ChatArea messages={messages} isTyping={isTyping} />
       <InputSection onSendMessage={handleSendMessage} />
     </div>
