@@ -1,6 +1,8 @@
 
 import React, { useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
+import { Clipboard } from 'lucide-react';
+import { toast } from "@/components/ui/use-toast";
 
 interface Message {
   id: number;
@@ -24,16 +26,34 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
     }
   }, [messages, isTyping]);
 
+  const copyMessage = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard",
+      description: "Message has been copied to your clipboard",
+      duration: 2000
+    });
+  };
+
   return (
     <div className="flex flex-col h-screen items-center justify-center">
-      <div className="flex-1 px-4 md:px-8 w-[800px] max-w-[800px] h-[500px] max-h-[500px] overflow-hidden" ref={scrollContainerRef}>
-        <div className="mx-auto py-4 h-full overflow-y-auto">
+      <div className="w-[500px] h-[500px] max-w-[500px] max-h-[500px] overflow-hidden border border-amp-cyan" ref={scrollContainerRef}>
+        <div className="mx-auto py-4 h-full overflow-y-auto px-4">
           {messages.map((message) => (
-            <MessageBubble
-              key={message.id}
-              message={message.text}
-              isAi={message.isAi}
-            />
+            <div key={message.id} className="relative group">
+              <MessageBubble
+                message={message.text}
+                isAi={message.isAi}
+              />
+              {message.isAi && (
+                <button 
+                  onClick={() => copyMessage(message.text)}
+                  className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity text-amp-cyan hover:text-amp-gray"
+                >
+                  <Clipboard size={16} />
+                </button>
+              )}
+            </div>
           ))}
           {isTyping && (
             <MessageBubble

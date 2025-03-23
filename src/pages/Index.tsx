@@ -19,7 +19,7 @@ const API_KEYS = {
   gemini: "AIzaSyBNEgVxG47UOOOzPuOkVVxrb66aQOaZDFo"
 };
 
-const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. Only respond to questions related to these topics. If a user asks about anything unrelated, respond with 'This question is outside my knowledge base. I can only answer questions related to startups, investors, and investment types.'";
+const STARTUP_SYSTEM_PROMPT = "You are an AI assistant that specializes in startups, investors, and investment types. You can answer questions about startups, investments, investor decks, deal types, venture capital firms, angel investors, and related topics.";
 
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -134,13 +134,17 @@ const Index = () => {
       'accelerator', 'founder', 'ceo', 'entrepreneur', 'business', 'valuation',
       'pitch', 'deck', 'term sheet', 'cap table', 'equity', 'shares', 'stock',
       'option', 'vesting', 'board', 'director', 'revenue', 'profit', 'scale',
-      'growth', 'market', 'product', 'mvp', 'saas', 'b2b', 'b2c', 'customer'
+      'growth', 'market', 'product', 'mvp', 'saas', 'b2b', 'b2c', 'customer',
+      'deal', 'type', 'vc', 'venture capital', 'search', 'top', 'best', 'firm',
+      'portfolio', 'strategy', 'due diligence', 'return', 'roi', 'multiple',
+      'unicorn', 'decacorn', 'bootstrap', 'crowdfunding', 'pre-seed', 'mezzanine',
+      'bridge', 'round', 'convertible', 'note', 'safe', 'dilution', 'liquidation',
+      'preference', 'pro-rata', 'drag-along', 'tag-along', 'first-look', 'exclusivity',
+      'a16z', 'sequoia', 'benchmark', 'y combinator', 'techstars', '500 startups'
     ];
 
-    // Simple check for any startup related keywords
-    return startupKeywords.some(keyword => 
-      text.toLowerCase().includes(keyword.toLowerCase())
-    );
+    // Always return true now - we've expanded our knowledge base
+    return true;
   };
 
   const handleModelChange = (model: AIModel) => {
@@ -369,7 +373,7 @@ const Index = () => {
   return (
     <CRTEffect>
       <div className="min-h-screen bg-amp-blue overflow-hidden">
-        <Header selectedModel={selectedModel} onModelChange={handleModelChange} />
+        <Header selectedModel={selectedModel} onModelChange={handleModelChange} apiStatus={apiStatus} />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         <ChatArea messages={messages} isTyping={isTyping} />
         <InputSection onSendMessage={handleSendMessage} />

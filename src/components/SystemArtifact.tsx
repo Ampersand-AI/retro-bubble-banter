@@ -34,26 +34,18 @@ const SystemArtifact = () => {
         <span className="mr-2">ID: {id}</span>
       </div>
       
-      <div className="flex-1 min-w-[100px]">
-        <div className="flex justify-between mb-1">
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
           <span>Load:</span>
+          <Progress value={processingLoad} className="h-2 bg-amp-blue w-24" />
           <span>{processingLoad}%</span>
         </div>
-        <Progress 
-          value={processingLoad} 
-          className="h-2 bg-amp-blue"
-        />
-      </div>
-      
-      <div className="flex-1 min-w-[100px]">
-        <div className="flex justify-between mb-1">
+        
+        <div className="flex items-center space-x-2">
           <span>Neural Sync:</span>
+          <Progress value={neuralSync} className="h-2 bg-amp-blue w-24" />
           <span>{neuralSync}%</span>
         </div>
-        <Progress 
-          value={neuralSync} 
-          className="h-2 bg-amp-blue"
-        />
       </div>
       
       <div className="text-amp-gray/70">

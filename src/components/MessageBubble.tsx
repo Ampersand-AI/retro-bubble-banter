@@ -14,7 +14,7 @@ const MessageBubble = ({ message, isAi, isTyping }: MessageBubbleProps) => {
       {isAi && (
         <div className="w-8 h-8 mr-2 mt-1 bg-amp-blue flex items-center justify-center flex-shrink-0">
           <img 
-            src="/lovable-uploads/3bbafd2f-59c3-4d81-83db-c7c4b9189da3.png" 
+            src="/lovable-uploads/ae5d333e-5be0-4b35-bb51-331e1ca052f8.png" 
             alt="AI Assistant" 
             className="w-6 h-6" 
           />
