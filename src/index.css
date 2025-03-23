@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&display=swap');
 
 @tailwind base;
@@ -76,6 +75,20 @@
 
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-amp-cyan;
+  }
+
+  /* Blinking cursor */
+  input.caret-amp-cyan {
+    caret-color: #00ffff;
+  }
+  
+  input.caret-[2px] {
+    caret-width: 2px;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
 }
 

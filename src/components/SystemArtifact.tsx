@@ -28,7 +28,7 @@ const SystemArtifact = () => {
   }, []);
   
   return (
-    <div className="flex items-center space-x-4 pixel-border border-amp-cyan bg-[#1a1c21] text-amp-cyan p-2 text-xs font-mono mr-4">
+    <div className="flex items-center space-x-4 bg-[#1a1c21] text-amp-cyan p-2 text-xs font-mono mr-4">
       <div className="flex items-center">
         <Cpu className="w-4 h-4 mr-2" />
         <span className="mr-2">ID: {id}</span>

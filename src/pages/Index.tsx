@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
@@ -24,7 +23,7 @@ const Index = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hello! I'm Amp AI, your retro-futuristic startup investment assistant. How can I help you today?",
+      text: "Hello! I'm Zack AI, your retro-futuristic startup investment assistant. How can I help you today?",
       isAi: true
     }
   ]);
