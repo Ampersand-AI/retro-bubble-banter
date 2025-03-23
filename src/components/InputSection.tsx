@@ -1,5 +1,5 @@
 
-import React, { useState, KeyboardEvent, useRef } from 'react';
+import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { Send, Mic, Paperclip } from 'lucide-react';
 
 interface InputSectionProps {
@@ -10,11 +10,25 @@ const InputSection = ({ onSendMessage }: InputSectionProps) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Auto-focus on the input field when component mounts
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
   
   const handleSend = () => {
     if (message.trim()) {
       onSendMessage(message);
       setMessage('');
+      // Re-focus the input after sending
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 0);
     }
   };
 
@@ -44,11 +58,19 @@ const InputSection = ({ onSendMessage }: InputSectionProps) => {
       
       recognition.onend = () => {
         setIsRecording(false);
+        // Re-focus the input after voice recording
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       };
       
       recognition.onerror = (event) => {
         console.error('Speech recognition error', event.error);
         setIsRecording(false);
+        // Re-focus the input after error
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
       };
       
       recognition.start();
@@ -67,12 +89,17 @@ const InputSection = ({ onSendMessage }: InputSectionProps) => {
       // Here you would implement file upload logic
       // For now, just add a placeholder message about the attachment
       setMessage(prev => prev + ` [Attached: ${files[0].name}]`);
+      
+      // Re-focus the input after attachment
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-amp-blue p-4 flex justify-center animate-fade-in-up">
-      <div className="w-1/2 flex items-center">
+    <div className="fixed bottom-8 left-0 right-0 flex justify-center">
+      <div className="w-[800px] max-w-[800px] flex items-center">
         <div className="flex items-center space-x-3 mr-3">
           <Mic 
             className={`w-6 h-6 ${isRecording ? 'text-amp-cyan' : 'text-amp-gray'} hover:text-amp-cyan cursor-pointer transition-colors`}
@@ -90,14 +117,15 @@ const InputSection = ({ onSendMessage }: InputSectionProps) => {
           />
         </div>
         
-        <div className="flex-1 bg-transparent">
+        <div className="flex-1">
           <input
+            ref={inputRef}
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder=""
-            className="w-full bg-transparent p-2 outline-none font-mono text-amp-gray placeholder:text-amp-dark-gray caret-amp-cyan caret-[2px]"
+            className="w-full bg-transparent p-2 outline-none font-mono text-amp-gray placeholder:text-amp-dark-gray caret-amp-cyan caret-[4px] animate-blink"
           />
         </div>
         

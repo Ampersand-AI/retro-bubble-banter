@@ -82,8 +82,8 @@
     caret-color: #00ffff;
   }
   
-  input.caret-[2px] {
-    caret-width: 2px;
+  input.caret-[4px] {
+    caret-width: 4px;
   }
   
   @keyframes blink {
@@ -93,6 +93,7 @@
 }
 
 @layer components {
+  /* CRT Effect Styles */
   .crt-effect {
     position: relative;
     overflow: hidden;

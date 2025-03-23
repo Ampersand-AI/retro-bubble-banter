@@ -41,7 +41,7 @@ const SystemArtifact = () => {
         </div>
         <Progress 
           value={processingLoad} 
-          className="h-2 bg-amp-gray/30"
+          className="h-2 bg-amp-blue"
         />
       </div>
       
@@ -52,7 +52,7 @@ const SystemArtifact = () => {
         </div>
         <Progress 
           value={neuralSync} 
-          className="h-2 bg-amp-gray/30"
+          className="h-2 bg-amp-blue"
         />
       </div>
       

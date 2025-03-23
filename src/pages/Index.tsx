@@ -4,6 +4,8 @@ import ChatArea from '../components/ChatArea';
 import InputSection from '../components/InputSection';
 import { AIModel } from '../components/ModelSelect';
 import { toast } from "../components/ui/use-toast";
+import CRTEffect from '../components/CRTEffect';
+import APIStatus from '../components/APIStatus';
 
 interface Message {
   id: number;
@@ -35,6 +37,7 @@ const Index = () => {
     claude: false,
     gemini: false
   });
+  const [showApiStatus, setShowApiStatus] = useState(true);
 
   // Check API status on load
   useEffect(() => {
@@ -55,36 +58,10 @@ const Index = () => {
           gemini: geminiStatus
         });
         
-        // Toast notifications for API status
-        if (openaiStatus) {
-          toast({ title: "OpenAI API Connected", description: "Successfully connected to OpenAI API" });
-        } else {
-          toast({ 
-            title: "OpenAI API Connection Issue", 
-            description: "Could not connect to OpenAI API", 
-            variant: "destructive" 
-          });
-        }
-        
-        if (claudeStatus) {
-          toast({ title: "Claude API Connected", description: "Successfully connected to Claude API" });
-        } else {
-          toast({ 
-            title: "Claude API Connection Issue", 
-            description: "Could not connect to Claude API", 
-            variant: "destructive" 
-          });
-        }
-        
-        if (geminiStatus) {
-          toast({ title: "Gemini API Connected", description: "Successfully connected to Gemini API" });
-        } else {
-          toast({ 
-            title: "Gemini API Connection Issue", 
-            description: "Could not connect to Gemini API", 
-            variant: "destructive" 
-          });
-        }
+        // Show API status component for 5 seconds
+        setTimeout(() => {
+          setShowApiStatus(false);
+        }, 5000);
         
       } catch (error) {
         console.error("Error validating APIs:", error);
@@ -390,11 +367,14 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-amp-blue overflow-hidden">
-      <Header selectedModel={selectedModel} onModelChange={handleModelChange} />
-      <ChatArea messages={messages} isTyping={isTyping} />
-      <InputSection onSendMessage={handleSendMessage} />
-    </div>
+    <CRTEffect>
+      <div className="min-h-screen bg-amp-blue overflow-hidden">
+        <Header selectedModel={selectedModel} onModelChange={handleModelChange} />
+        {showApiStatus && <APIStatus apiStatus={apiStatus} />}
+        <ChatArea messages={messages} isTyping={isTyping} />
+        <InputSection onSendMessage={handleSendMessage} />
+      </div>
+    </CRTEffect>
   );
 };
 
