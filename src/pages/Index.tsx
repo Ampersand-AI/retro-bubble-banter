@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import ChatArea from '../components/ChatArea';
@@ -67,204 +68,7 @@ const Index = () => {
     setSelectedSubModel(DEFAULT_SUBMODELS[selectedModel]);
   }, [selectedModel]);
 
-  // Check API status on load - optimized with useCallback
-  useEffect(() => {
-    const validateApis = async () => {
-      try {
-        // Test APIs in parallel for better performance
-        const [openaiStatus, claudeStatus, geminiStatus] = await Promise.all([
-          testOpenAIApi(),
-          testClaudeApi(),
-          testGeminiApi()
-        ]);
-        
-        setApiStatus({
-          openai: openaiStatus,
-          claude: claudeStatus,
-          gemini: geminiStatus
-        });
-      } catch (error) {
-        console.error("Error validating APIs:", error);
-      }
-    };
-    
-    validateApis();
-  }, []);
-
-  const testOpenAIApi = useCallback(async (): Promise<boolean> => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
-      const response = await fetch('https://api.openai.com/v1/models', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${API_KEYS.openai}`
-        },
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      return response.status === 200;
-    } catch (error) {
-      console.error("OpenAI API test error:", error);
-      return false;
-    }
-  }, []);
-
-  const testClaudeApi = useCallback(async (): Promise<boolean> => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': API_KEYS.claude,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: 'claude-3-haiku-20240307',
-          max_tokens: 10,
-          messages: [
-            { role: 'user', content: 'Hi' }
-          ]
-        }),
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      return response.status === 200;
-    } catch (error) {
-      console.error("Claude API test error:", error);
-      return false;
-    }
-  }, []);
-
-  const testGeminiApi = useCallback(async (): Promise<boolean> => {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-      
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${API_KEYS.gemini}`, {
-        method: 'GET',
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      return response.status === 200;
-    } catch (error) {
-      console.error("Gemini API test error:", error);
-      return false;
-    }
-  }, []);
-
-  const isStartupRelated = (text: string) => {
-    // Always return true now - we've expanded our knowledge base
-    return true;
-  };
-
-  const handleModelChange = (model: AIModel) => {
-    setSelectedModel(model);
-    setSelectedSubModel(DEFAULT_SUBMODELS[model]);
-    setMessages(prevMessages => [
-      ...prevMessages,
-      {
-        id: messageIdCounter,
-        text: `Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`,
-        isAi: true,
-        tokenCount: {
-          input: 0,
-          output: estimateTokens(`Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`)
-        }
-      }
-    ]);
-    setMessageIdCounter(prev => prev + 1);
-  };
-
-  const handleSubModelChange = (subModel: string) => {
-    setSelectedSubModel(subModel);
-    // Optionally notify the user about the submodel change
-    toast({
-      title: `Model Updated`,
-      description: `Now using ${subModel}`,
-      duration: 2000
-    });
-  };
-
-  const fetchAIResponse = useCallback(async (userMessage: string) => {
-    setIsTyping(true);
-    
-    try {
-      let response;
-      
-      if (!isStartupRelated(userMessage)) {
-        // Return a canned response for non-startup related questions
-        setTimeout(() => {
-          setMessages(prevMessages => [
-            ...prevMessages,
-            {
-              id: messageIdCounter + 1,
-              text: "I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.",
-              isAi: true,
-              tokenCount: {
-                input: estimateTokens(userMessage),
-                output: estimateTokens("I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.")
-              }
-            }
-          ]);
-          setMessageIdCounter(prev => prev + 2);
-          setIsTyping(false);
-        }, 1000);
-        return;
-      }
-      
-      switch (selectedModel) {
-        case 'openai':
-          response = await fetchOpenAIResponse(userMessage, selectedSubModel);
-          break;
-        case 'claude':
-          response = await fetchClaudeResponse(userMessage, selectedSubModel);
-          break;
-        case 'gemini':
-          response = await fetchGeminiResponse(userMessage, selectedSubModel);
-          break;
-        default:
-          // Fallback to simulated response
-          response = simulateResponse(userMessage);
-      }
-      
-      setMessages(prevMessages => [
-        ...prevMessages,
-        {
-          id: messageIdCounter + 1,
-          text: response.text,
-          isAi: true,
-          tokenCount: response.tokenCount
-        }
-      ]);
-      setMessageIdCounter(prev => prev + 2);
-    } catch (error) {
-      console.error("Error fetching AI response:", error);
-      setMessages(prevMessages => [
-        ...prevMessages,
-        {
-          id: messageIdCounter + 1,
-          text: "Sorry, I encountered an error while processing your request. Please try again.",
-          isAi: true,
-          tokenCount: {
-            input: estimateTokens(userMessage),
-            output: estimateTokens("Sorry, I encountered an error while processing your request. Please try again.")
-          }
-        }
-      ]);
-      setMessageIdCounter(prev => prev + 2);
-    } finally {
-      setIsTyping(false);
-    }
-  }, [selectedModel, selectedSubModel, messageIdCounter, fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse]);
-
+  // *** MOVED FUNCTION DECLARATIONS UP ***
   const fetchOpenAIResponse = useCallback(async (userMessage: string, subModel: string) => {
     try {
       const controller = new AbortController();
@@ -444,6 +248,7 @@ const Index = () => {
     }
   }, []);
 
+  // Define simulateResponse which is used in the fetch functions
   const simulateResponse = (userMessage: string) => {
     // List of possible startup-related AI responses
     const responses = [
@@ -470,6 +275,204 @@ const Index = () => {
       }
     };
   };
+
+  // Check API status on load - optimized with useCallback
+  useEffect(() => {
+    const validateApis = async () => {
+      try {
+        // Test APIs in parallel for better performance
+        const [openaiStatus, claudeStatus, geminiStatus] = await Promise.all([
+          testOpenAIApi(),
+          testClaudeApi(),
+          testGeminiApi()
+        ]);
+        
+        setApiStatus({
+          openai: openaiStatus,
+          claude: claudeStatus,
+          gemini: geminiStatus
+        });
+      } catch (error) {
+        console.error("Error validating APIs:", error);
+      }
+    };
+    
+    validateApis();
+  }, []);
+
+  const testOpenAIApi = useCallback(async (): Promise<boolean> => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch('https://api.openai.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${API_KEYS.openai}`
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      return response.status === 200;
+    } catch (error) {
+      console.error("OpenAI API test error:", error);
+      return false;
+    }
+  }, []);
+
+  const testClaudeApi = useCallback(async (): Promise<boolean> => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEYS.claude,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-haiku-20240307',
+          max_tokens: 10,
+          messages: [
+            { role: 'user', content: 'Hi' }
+          ]
+        }),
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      return response.status === 200;
+    } catch (error) {
+      console.error("Claude API test error:", error);
+      return false;
+    }
+  }, []);
+
+  const testGeminiApi = useCallback(async (): Promise<boolean> => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${API_KEYS.gemini}`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      return response.status === 200;
+    } catch (error) {
+      console.error("Gemini API error:", error);
+      return false;
+    }
+  }, []);
+
+  const isStartupRelated = (text: string) => {
+    // Always return true now - we've expanded our knowledge base
+    return true;
+  };
+
+  const handleModelChange = (model: AIModel) => {
+    setSelectedModel(model);
+    setSelectedSubModel(DEFAULT_SUBMODELS[model]);
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {
+        id: messageIdCounter,
+        text: `Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`,
+        isAi: true,
+        tokenCount: {
+          input: 0,
+          output: estimateTokens(`Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`)
+        }
+      }
+    ]);
+    setMessageIdCounter(prev => prev + 1);
+  };
+
+  const handleSubModelChange = (subModel: string) => {
+    setSelectedSubModel(subModel);
+    // Optionally notify the user about the submodel change
+    toast({
+      title: `Model Updated`,
+      description: `Now using ${subModel}`,
+      duration: 2000
+    });
+  };
+
+  const fetchAIResponse = useCallback(async (userMessage: string) => {
+    setIsTyping(true);
+    
+    try {
+      let response;
+      
+      if (!isStartupRelated(userMessage)) {
+        // Return a canned response for non-startup related questions
+        setTimeout(() => {
+          setMessages(prevMessages => [
+            ...prevMessages,
+            {
+              id: messageIdCounter + 1,
+              text: "I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.",
+              isAi: true,
+              tokenCount: {
+                input: estimateTokens(userMessage),
+                output: estimateTokens("I'm limited to Startups Knowledge base. Please ask me about startups, investors, or investment types.")
+              }
+            }
+          ]);
+          setMessageIdCounter(prev => prev + 2);
+          setIsTyping(false);
+        }, 1000);
+        return;
+      }
+      
+      switch (selectedModel) {
+        case 'openai':
+          response = await fetchOpenAIResponse(userMessage, selectedSubModel);
+          break;
+        case 'claude':
+          response = await fetchClaudeResponse(userMessage, selectedSubModel);
+          break;
+        case 'gemini':
+          response = await fetchGeminiResponse(userMessage, selectedSubModel);
+          break;
+        default:
+          // Fallback to simulated response
+          response = simulateResponse(userMessage);
+      }
+      
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          id: messageIdCounter + 1,
+          text: response.text,
+          isAi: true,
+          tokenCount: response.tokenCount
+        }
+      ]);
+      setMessageIdCounter(prev => prev + 2);
+    } catch (error) {
+      console.error("Error fetching AI response:", error);
+      setMessages(prevMessages => [
+        ...prevMessages,
+        {
+          id: messageIdCounter + 1,
+          text: "Sorry, I encountered an error while processing your request. Please try again.",
+          isAi: true,
+          tokenCount: {
+            input: estimateTokens(userMessage),
+            output: estimateTokens("Sorry, I encountered an error while processing your request. Please try again.")
+          }
+        }
+      ]);
+      setMessageIdCounter(prev => prev + 2);
+    } finally {
+      setIsTyping(false);
+    }
+  }, [selectedModel, selectedSubModel, messageIdCounter, fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse]);
 
   const handleSendMessage = useCallback((message: string) => {
     // Add user message
