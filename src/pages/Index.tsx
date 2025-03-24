@@ -247,49 +247,30 @@ const Index = () => {
   }, [messages, session]);
 
   const handleAuthSuccess = async (newUserProfile: UserProfile) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
+    try {
+      console.log('Auth success, updating user profile:', newUserProfile);
+      
+      if (!newUserProfile.id) {
+        console.error('No user ID in profile');
+        throw new Error('Invalid user profile');
+      }
+
+      setUserProfile(newUserProfile);
+      setTokenUsage(newUserProfile.token_usage);
+      setIsAuthenticated(true);
+      
+      toast({
+        title: "Success",
+        description: "Welcome back!",
+      });
+    } catch (error: any) {
+      console.error('Error handling auth success:', error);
       toast({
         title: "Error",
-        description: "Failed to get user data",
+        description: error.message || "Failed to complete authentication",
         variant: "destructive",
       });
-      return;
     }
-
-    // Create or update profile in Supabase
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({
-        id: user.id,
-        email: newUserProfile.email,
-        is_subscribed: newUserProfile.is_subscribed,
-        subscription_tier: newUserProfile.subscription_tier || 'free',
-        token_usage: {
-          total: 0,
-          limit: 5000, // Increased from 1000 to 5000
-          remaining: 5000
-        }
-      });
-
-    if (error) {
-      console.error('Error creating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create user profile",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setUserProfile(newUserProfile);
-    setTokenUsage({
-      total: 0,
-      limit: 5000,
-      remaining: 5000
-    });
-    setIsAuthenticated(true);
   };
 
   const handleLogout = async () => {

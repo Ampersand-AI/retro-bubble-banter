@@ -12,14 +12,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabase";
 
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAuthSuccess: (userProfile: {
+    id: string;
     email: string;
-    isSubscribed: boolean;
-    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+    is_subscribed: boolean;
+    subscription_tier?: 'free' | 'pro' | 'enterprise';
   }) => void;
 }
 
@@ -34,28 +36,52 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Here you would implement actual sign-in logic
-      // For now, we'll just simulate a successful sign-in
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a user profile
-      const userProfile = {
+      console.log('Attempting sign in for email:', email);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        isSubscribed: false,
-        subscriptionTier: 'free' as const
-      };
-      
-      onAuthSuccess(userProfile);
+        password,
+      });
+
+      if (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
+
+      if (!data.user) {
+        console.error('No user data returned after sign in');
+        throw new Error('No user data returned');
+      }
+
+      console.log('Sign in successful, fetching user profile');
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
+      }
+
+      if (!profile) {
+        console.error('No profile found for user');
+        throw new Error('No profile found');
+      }
+
+      console.log('Profile fetched successfully:', profile);
+      onAuthSuccess(profile);
       onOpenChange(false);
       
       toast({
         title: "Success",
         description: "You have successfully signed in!",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Sign in process failed:', error);
       toast({
         title: "Error",
-        description: "Failed to sign in. Please try again.",
+        description: error.message || "Failed to sign in. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -77,28 +103,100 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Here you would implement actual sign-up logic
-      // For now, we'll just simulate a successful sign-up
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a user profile
-      const userProfile = {
+      console.log('Attempting sign up for email:', email);
+      const { data, error } = await supabase.auth.signUp({
         email,
-        isSubscribed: false,
-        subscriptionTier: 'free' as const
-      };
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+
+      if (error) {
+        console.error('Sign up error:', error);
+        throw error;
+      }
+
+      if (!data.user) {
+        console.error('No user data returned after sign up');
+        throw new Error('No user data returned');
+      }
+
+      // Check if email confirmation is required
+      if (data.session === null) {
+        console.log('Email confirmation required');
+        toast({
+          title: "Check your email",
+          description: "We've sent you a confirmation email. Please check your inbox and click the confirmation link to complete your registration.",
+        });
+        onOpenChange(false);
+        return;
+      }
+
+      console.log('Sign up successful, waiting for profile creation');
       
-      onAuthSuccess(userProfile);
+      // Add retry logic for profile creation
+      let profile = null;
+      let retryCount = 0;
+      const maxRetries = 5;
+      
+      while (!profile && retryCount < maxRetries) {
+        try {
+          console.log(`Attempt ${retryCount + 1} to fetch profile`);
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select()
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            throw profileError;
+          }
+
+          if (profileData) {
+            profile = profileData;
+            break;
+          }
+
+          console.log('Profile not ready yet, retrying...');
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          retryCount++;
+        } catch (err: any) {
+          console.error('Error during profile fetch:', err);
+          if (err.code === 'PGRST116') {
+            console.log('Profile not found yet, retrying...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            retryCount++;
+            continue;
+          }
+          throw err;
+        }
+      }
+
+      if (!profile) {
+        console.error('Failed to fetch profile after multiple attempts');
+        toast({
+          title: "Account Created",
+          description: "Your account has been created. Please check your email for confirmation and then sign in to continue.",
+        });
+        onOpenChange(false);
+        return;
+      }
+
+      console.log('Profile fetched successfully:', profile);
+      onAuthSuccess(profile);
       onOpenChange(false);
       
       toast({
         title: "Success",
         description: "Account created successfully!",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Sign up process failed:', error);
       toast({
         title: "Error",
-        description: "Failed to create account. Please try again.",
+        description: error.message || "Failed to create account. Please try again.",
         variant: "destructive",
       });
     } finally {
