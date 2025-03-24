@@ -51,9 +51,9 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
   return (
     <div className={`flex items-start mb-4 animate-fade-in-up ${isAi ? 'justify-start' : 'justify-end'}`}>
       {isAi && (
-        <div className="w-8 h-8 mr-2 mt-1 bg-amp-blue flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 mr-1 bg-amp-blue flex items-center justify-center flex-shrink-0">
           <img 
-            src="/lovable-uploads/d8aff0f2-6bde-4839-8047-d0aa14601210.png" 
+            src="/images/rovyk.png" 
             alt="AI Assistant" 
             className="w-6 h-6 filter brightness-100 saturate-100 hue-rotate-60" 
           />
@@ -64,7 +64,7 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
           isAi 
             ? 'bg-transparent text-amp-cyan' 
             : 'bg-transparent text-amp-gray'
-        } p-3 max-w-[75%] break-words`}
+        } px-3 max-w-[75%] break-words`}
       >
         {isTyping ? (
           <TypingIndicator />

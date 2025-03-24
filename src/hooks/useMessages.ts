@@ -13,11 +13,11 @@ export const useMessages = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Welcome to Zack AI by Ampersand! You can experience various premium AI models at a fraction of the cost.",
+      text: "Welcome to Rovyk by Ampersand! You can experience various premium AI models at a fraction of the cost.",
       isAi: true,
       tokenCount: {
         input: 0,
-        output: estimateTokens("Welcome to Zack AI by Ampersand! You can experience various premium AI models at a fraction of the cost.")
+        output: estimateTokens("Welcome to Rovyk by Ampersand! You can experience various premium AI models at a fraction of the cost.")
       }
     }
   ]);

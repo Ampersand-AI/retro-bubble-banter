@@ -208,7 +208,7 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6 max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-pixel mb-2 text-center">Welcome to Zack AI</DialogTitle>
+          <DialogTitle className="text-xl font-pixel mb-2 text-center">Welcome to Rovyk</DialogTitle>
           <DialogDescription className="text-center text-amp-gray">
             Sign in or create an account to continue
           </DialogDescription>
