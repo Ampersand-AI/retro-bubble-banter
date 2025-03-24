@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import { Clipboard } from 'lucide-react';
@@ -40,38 +39,36 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex justify-center items-center h-[calc(100vh-4rem)] pt-16">
-      <div className="h-full max-w-4xl max-h-[750px] overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-4rem)] pr-[25px]">
-          <div className="px-4 py-4">
-            {messages.map((message) => (
-              <div key={message.id} className="relative group">
-                <MessageBubble
-                  message={message.text}
-                  isAi={message.isAi}
-                  tokenCount={message.tokenCount}
-                />
-                {message.isAi && (
-                  <button 
-                    onClick={() => copyMessage(message.text)}
-                    className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity text-amp-cyan hover:text-amp-gray"
-                  >
-                    <Clipboard size={16} />
-                  </button>
-                )}
-              </div>
-            ))}
-            {isTyping && (
+    <div className="flex-1 overflow-hidden">
+      <ScrollArea className="h-full">
+        <div className="px-4 py-4">
+          {messages.map((message) => (
+            <div key={message.id} className="relative group">
               <MessageBubble
-                message=""
-                isAi={true}
-                isTyping={true}
+                message={message.text}
+                isAi={message.isAi}
+                tokenCount={message.tokenCount}
               />
-            )}
-            <div ref={chatEndRef} />
-          </div>
-        </ScrollArea>
-      </div>
+              {message.isAi && (
+                <button 
+                  onClick={() => copyMessage(message.text)}
+                  className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity text-amp-cyan hover:text-amp-gray"
+                >
+                  <Clipboard size={16} />
+                </button>
+              )}
+            </div>
+          ))}
+          {isTyping && (
+            <MessageBubble
+              message=""
+              isAi={true}
+              isTyping={true}
+            />
+          )}
+          <div ref={chatEndRef} />
+        </div>
+      </ScrollArea>
     </div>
   );
 };

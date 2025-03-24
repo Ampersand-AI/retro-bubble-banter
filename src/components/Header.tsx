@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, BarChart3 } from 'lucide-react';
+import { Menu, UserCog, History } from 'lucide-react';
 import { AIModel } from '../config/apiConfig';
 import SystemArtifact from './SystemArtifact';
 import ModelSelect from './ModelSelect';
@@ -18,9 +18,10 @@ interface HeaderProps {
     };
   }>;
   onTokenStatsClick: () => void;
+  onChatHistoryClick: () => void;
 }
 
-const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStatsClick }: HeaderProps) => {
+const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStatsClick, onChatHistoryClick }: HeaderProps) => {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-amp-blue z-50 animate-fade-in-down">
       <div className="flex items-center justify-between h-full px-4 md:px-8">
@@ -37,11 +38,18 @@ const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStat
             apiStatus={apiStatus}
           />
           <button
+            onClick={onChatHistoryClick}
+            className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
+          >
+            <History className="w-5 h-5" />
+            <span className="text-sm">History</span>
+          </button>
+          <button
             onClick={onTokenStatsClick}
             className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
           >
-            <BarChart3 className="w-5 h-5" />
-            <span className="text-sm">Token Stats</span>
+            <UserCog className="w-5 h-5" />
+            <span className="text-sm">Account & Usage</span>
           </button>
         </div>
       </div>

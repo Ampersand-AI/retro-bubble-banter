@@ -8,6 +8,7 @@ import {
   fetchDeepSeekResponse,
   fetchGrokResponse 
 } from '../services/apiService';
+import { supabase } from '@/lib/supabase';
 
 export const useMessages = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -24,9 +25,94 @@ export const useMessages = () => {
   
   const [isTyping, setIsTyping] = useState(false);
   const [messageIdCounter, setMessageIdCounter] = useState(2);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
-  const addMessage = useCallback((message: Message) => {
+  const addMessage = useCallback(async (message: Message) => {
+    console.log('Adding message:', message);
     setMessages(prevMessages => [...prevMessages, message]);
+
+    // Save message to chat history if it's not the welcome message
+    if (message.id !== 1) {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        console.log('Current user:', user);
+        
+        if (userError) {
+          console.error('Error getting user:', userError);
+          throw userError;
+        }
+
+        if (user) {
+          console.log('Current conversation ID:', currentConversationId);
+          
+          // If this is the first message in a conversation, create a new conversation ID
+          if (!currentConversationId) {
+            console.log('Creating new conversation');
+            const conversationId = crypto.randomUUID();
+            console.log('Generated conversation ID:', conversationId);
+            
+            // First, insert the message with the new conversation ID
+            const { error: insertError } = await supabase
+              .from('chat_history')
+              .insert({
+                user_id: user.id,
+                message: message.text,
+                is_ai: message.isAi,
+                model: message.model || 'default',
+                token_count: message.tokenCount,
+                conversation_id: conversationId
+              });
+
+            if (insertError) {
+              console.error('Error inserting message:', insertError);
+              throw insertError;
+            }
+
+            // Then fetch the inserted message to get the conversation ID
+            const { data: insertedMessage, error: fetchError } = await supabase
+              .from('chat_history')
+              .select('conversation_id')
+              .eq('user_id', user.id)
+              .eq('message', message.text)
+              .single();
+
+            if (fetchError) {
+              console.error('Error fetching inserted message:', fetchError);
+              throw fetchError;
+            }
+
+            if (insertedMessage) {
+              console.log('Set conversation ID:', insertedMessage.conversation_id);
+              setCurrentConversationId(insertedMessage.conversation_id);
+            }
+          } else {
+            console.log('Adding message to existing conversation:', currentConversationId);
+            const { error } = await supabase
+              .from('chat_history')
+              .insert({
+                user_id: user.id,
+                message: message.text,
+                is_ai: message.isAi,
+                model: message.model || 'default',
+                token_count: message.tokenCount,
+                conversation_id: currentConversationId
+              });
+
+            if (error) {
+              console.error('Error adding message to conversation:', error);
+              throw error;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error saving chat history:', error);
+      }
+    }
+  }, [currentConversationId]);
+
+  const setMessagesWithReset = useCallback((newMessages: Message[]) => {
+    setMessages(newMessages);
+    setCurrentConversationId(null); // Reset conversation ID when loading a new chat
   }, []);
 
   const addModelSwitchMessage = useCallback((model: AIModel, counter: number) => {
@@ -44,111 +130,83 @@ export const useMessages = () => {
     return counter + 1;
   }, [addMessage]);
 
-  const handleSendMessage = useCallback(async (
-    message: string, 
-    selectedModel: AIModel, 
-    selectedSubModel: string, 
-    currentCounter: number
-  ) => {
-    // Add user message
-    const userMessageId = currentCounter;
-    const userTokenCount = estimateTokens(message);
-    
-    addMessage({
-      id: userMessageId,
+  const handleSendMessage = useCallback(async (message: string, model: AIModel, subModel: string) => {
+    if (!message.trim()) return;
+
+    const userMessage: Message = {
+      id: messageIdCounter,
       text: message,
       isAi: false,
+      model: subModel,
       tokenCount: {
-        input: userTokenCount,
+        input: estimateTokens(message),
         output: 0
       }
-    });
-    
-    setMessageIdCounter(userMessageId + 1);
-    
-    // Start typing animation
+    };
+
+    setMessageIdCounter(prev => prev + 1);
+    await addMessage(userMessage);
+
     setIsTyping(true);
-    
+
     try {
-      // Check if this is an identity question and override with standard response
-      if (checkModelIdentityQuestion(message)) {
-        const identityResponse = getIdentityResponse();
-        
-        setTimeout(() => {
-          addMessage({
-            id: userMessageId + 1,
-            text: identityResponse,
-            isAi: true,
-            tokenCount: {
-              input: userTokenCount,
-              output: estimateTokens(identityResponse)
-            }
-          });
-          
-          setMessageIdCounter(userMessageId + 2);
-          setIsTyping(false);
-        }, 1000); // Short delay to simulate thinking
-        
-        return;
-      }
-      
       let response;
-      
-      switch (selectedModel) {
+      switch (model) {
         case 'openai':
-          response = await fetchOpenAIResponse(message, selectedSubModel);
+          response = await fetchOpenAIResponse(message, subModel);
           break;
         case 'claude':
-          response = await fetchClaudeResponse(message, selectedSubModel);
+          response = await fetchClaudeResponse(message, subModel);
           break;
         case 'gemini':
-          response = await fetchGeminiResponse(message, selectedSubModel);
+          response = await fetchGeminiResponse(message, subModel);
           break;
         case 'deepseek':
-          response = await fetchDeepSeekResponse(message, selectedSubModel);
+          response = await fetchDeepSeekResponse(message, subModel);
           break;
         case 'grok':
-          response = await fetchGrokResponse(message, selectedSubModel);
+          response = await fetchGrokResponse(message, subModel);
           break;
         default:
-          // This shouldn't happen with TypeScript's type checking
-          throw new Error('Invalid model selected');
+          response = await fetchOpenAIResponse(message, subModel);
       }
-      
-      addMessage({
-        id: userMessageId + 1,
+
+      const aiMessage: Message = {
+        id: messageIdCounter + 1,
         text: response.text,
         isAi: true,
+        model: subModel,
         tokenCount: response.tokenCount
-      });
-      
-      setMessageIdCounter(userMessageId + 2);
+      };
+
+      setMessageIdCounter(prev => prev + 2);
+      await addMessage(aiMessage);
     } catch (error) {
-      console.error("Error fetching AI response:", error);
-      
-      addMessage({
-        id: userMessageId + 1,
-        text: "Sorry, I encountered an error while processing your request. Please try again.",
+      console.error('Error getting AI response:', error);
+      const errorMessage: Message = {
+        id: messageIdCounter + 1,
+        text: "Sorry, I encountered an error. Please try again.",
         isAi: true,
+        model: subModel,
         tokenCount: {
-          input: userTokenCount,
-          output: estimateTokens("Sorry, I encountered an error while processing your request. Please try again.")
+          input: 0,
+          output: 0
         }
-      });
-      
-      setMessageIdCounter(userMessageId + 2);
+      };
+      setMessageIdCounter(prev => prev + 2);
+      await addMessage(errorMessage);
     } finally {
       setIsTyping(false);
     }
-  }, [addMessage]);
+  }, [messageIdCounter, addMessage]);
 
   return {
     messages,
     isTyping,
     messageIdCounter,
     setMessageIdCounter,
-    addMessage,
     addModelSwitchMessage,
-    handleSendMessage
+    handleSendMessage,
+    setMessages: setMessagesWithReset
   };
 };

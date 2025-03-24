@@ -1,7 +1,7 @@
 import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { Send, Mic, Paperclip } from 'lucide-react';
 import ModelDropdown from './ModelDropdown';
-import { AIModel } from './ModelSelect';
+import { AIModel } from '../config/apiConfig';
 import AuthDialog from './AuthDialog';
 
 interface InputSectionProps {
@@ -11,9 +11,10 @@ interface InputSectionProps {
   onSubModelChange: (subModel: string) => void;
   isAuthenticated?: boolean;
   onAuthSuccess?: (userProfile: {
+    id: string;
     email: string;
-    isSubscribed: boolean;
-    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+    is_subscribed: boolean;
+    subscription_tier?: 'free' | 'pro' | 'enterprise';
   }) => void;
 }
 
@@ -110,9 +111,10 @@ const InputSection = ({
   };
 
   const handleAuthSuccess = (userProfile: {
+    id: string;
     email: string;
-    isSubscribed: boolean;
-    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+    is_subscribed: boolean;
+    subscription_tier?: 'free' | 'pro' | 'enterprise';
   }) => {
     if (onAuthSuccess) {
       onAuthSuccess(userProfile);
@@ -126,7 +128,7 @@ const InputSection = ({
   return (
     <>
       <div className="fixed bottom-8 left-0 right-0 flex justify-center">
-        <div className="w-[850px] max-w-[850px] flex items-center">
+        <div className="w-full max-w-4xl mx-auto px-4 flex items-center">
           <div className="flex items-center space-x-3 mr-3">
             <Mic 
               className={`w-6 h-6 ${isRecording ? 'text-blue-500' : 'text-blue-400'} hover:text-blue-600 cursor-pointer transition-colors`}

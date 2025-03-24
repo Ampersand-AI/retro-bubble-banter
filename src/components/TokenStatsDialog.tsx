@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,8 +9,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { toast } from "@/components/ui/use-toast";
-import { LogOut, User, Crown, LogIn } from 'lucide-react';
+import { toast } from "sonner";
+import { LogOut, User, Crown, LogIn, Edit2, Save, X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface TokenStatsDialogProps {
   open: boolean;
@@ -18,9 +19,16 @@ interface TokenStatsDialogProps {
   onLogout: () => void;
   onSignIn: () => void;
   userProfile: {
+    id: string;
     email: string;
-    isSubscribed: boolean;
-    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+    full_name: string;
+    is_subscribed: boolean;
+    subscription_tier: string;
+    token_usage: {
+      total: number;
+      limit: number;
+      remaining: number;
+    };
   };
   tokenUsage: {
     total: number;
@@ -39,6 +47,9 @@ const TokenStatsDialog = ({
   tokenUsage,
   isAuthenticated
 }: TokenStatsDialogProps) => {
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(userProfile.full_name || '');
+
   const usagePercentage = (tokenUsage.total / tokenUsage.limit) * 100;
 
   const handleLogout = () => {
@@ -55,6 +66,68 @@ const TokenStatsDialog = ({
     onOpenChange(false);
   };
 
+  const handleNameUpdate = async () => {
+    try {
+      // First, check if the profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userProfile.id)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching profile:', fetchError);
+        throw fetchError;
+      }
+
+      // Update the profile with the new name
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ 
+          full_name: editedName,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userProfile.id);
+
+      if (updateError) {
+        console.error('Error updating profile:', updateError);
+        throw updateError;
+      }
+
+      // Refresh the profile data
+      const { data: updatedProfile, error: refreshError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userProfile.id)
+        .single();
+
+      if (refreshError) {
+        console.error('Error refreshing profile:', refreshError);
+        throw refreshError;
+      }
+
+      // Update the local state with the new profile data
+      if (updatedProfile) {
+        setEditedName(updatedProfile.full_name || '');
+        setIsEditingName(false);
+        toast('Name updated successfully', {
+          style: {
+            background: '#4CAF50',
+            color: '#fff',
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error updating name:', error);
+      toast('Failed to update name', {
+        style: {
+          background: '#f44336',
+          color: '#fff',
+        },
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6 max-w-md">
@@ -69,15 +142,53 @@ const TokenStatsDialog = ({
         <div className="space-y-4 mb-6">
           <div className="flex items-center space-x-3 p-3 bg-amp-dark-blue rounded-lg border border-amp-cyan">
             <User className="w-5 h-5 text-amp-cyan" />
-            <div>
-              <p className="text-sm font-mono">{userProfile.email || 'Not signed in'}</p>
-              <div className="flex items-center space-x-2">
+            <div className="flex-1">
+              {isEditingName ? (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    className="bg-amp-blue border border-amp-cyan text-amp-cyan px-2 py-1 rounded flex-1"
+                    placeholder="Enter your name"
+                  />
+                  <button
+                    onClick={handleNameUpdate}
+                    className="text-green-500 hover:text-green-400"
+                  >
+                    <Save className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingName(false);
+                      setEditedName(userProfile.full_name || '');
+                    }}
+                    className="text-red-500 hover:text-red-400"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-mono">{userProfile.full_name || 'Set your name'}</p>
+                    <p className="text-sm font-mono text-amp-gray">{userProfile.email || 'Not signed in'}</p>
+                  </div>
+                  <button
+                    onClick={() => setIsEditingName(true)}
+                    className="text-amp-cyan hover:text-amp-gray"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              <div className="flex items-center space-x-2 mt-1">
                 {isAuthenticated ? (
-                  userProfile.isSubscribed ? (
+                  userProfile.is_subscribed ? (
                     <>
                       <Crown className="w-4 h-4 text-yellow-400" />
                       <span className="text-sm text-yellow-400">
-                        {userProfile.subscriptionTier?.charAt(0).toUpperCase()}{userProfile.subscriptionTier?.slice(1)} Plan
+                        {userProfile.subscription_tier?.charAt(0).toUpperCase()}{userProfile.subscription_tier?.slice(1)} Plan
                       </span>
                     </>
                   ) : (

@@ -18,6 +18,7 @@ import {
 } from '../services/apiStatusService';
 import { useMessages } from '../hooks/useMessages';
 import { supabase, UserProfile } from '../lib/supabase';
+import ChatHistory from '@/components/ChatHistory';
 
 interface TokenUsage {
   total: number;
@@ -58,6 +59,8 @@ const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const [session, setSession] = useState<any>(null);
+  const [showChatHistory, setShowChatHistory] = useState(false);
+  const [selectedChat, setSelectedChat] = useState<Message[]>([]);
 
   // Use our custom hook for messages
   const { 
@@ -66,7 +69,8 @@ const Index = () => {
     messageIdCounter, 
     setMessageIdCounter, 
     addModelSwitchMessage, 
-    handleSendMessage 
+    handleSendMessage,
+    setMessages
   } = useMessages();
 
   // Update submodel when the main model changes
@@ -318,6 +322,12 @@ const Index = () => {
     setShowAuthDialog(true);
   };
 
+  const handleSelectChat = (messages: Message[]) => {
+    setSelectedChat(messages);
+    setMessages(messages);
+    setShowChatHistory(false);
+  };
+
   return (
     <CRTEffect>
       <div className="min-h-screen bg-amp-blue overflow-hidden">
@@ -327,17 +337,37 @@ const Index = () => {
           apiStatus={apiStatus}
           messages={messages}
           onTokenStatsClick={() => setShowTokenStats(true)}
+          onChatHistoryClick={() => setShowChatHistory(!showChatHistory)}
         />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
-        <ChatArea messages={messages} isTyping={isTyping} />
-        <InputSection 
-          onSendMessage={handleSendUserMessage} 
-          selectedModel={selectedModel}
-          selectedSubModel={selectedSubModel}
-          onSubModelChange={handleSubModelChange}
-          isAuthenticated={isAuthenticated}
-          onAuthSuccess={handleAuthSuccess}
-        />
+        
+        <div className="flex h-[calc(100vh-4rem)] pt-16">
+          {/* Chat History Sidebar */}
+          <div className={`fixed left-0 top-16 bottom-0 w-64 bg-amp-dark-blue border-r border-amp-cyan transition-transform duration-300 z-40 ${showChatHistory ? 'translate-x-0' : '-translate-x-full'}`}>
+            {session?.user && (
+              <ChatHistory 
+                userId={session.user.id} 
+                onSelectChat={handleSelectChat}
+              />
+            )}
+          </div>
+
+          {/* Main Chat Area */}
+          <div className={`flex-1 flex flex-col transition-all duration-300 ${showChatHistory ? 'ml-64' : 'ml-0'}`}>
+            <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+              <ChatArea messages={messages} isTyping={isTyping} />
+              <InputSection 
+                onSendMessage={handleSendUserMessage} 
+                selectedModel={selectedModel}
+                selectedSubModel={selectedSubModel}
+                onSubModelChange={handleSubModelChange}
+                isAuthenticated={isAuthenticated}
+                onAuthSuccess={handleAuthSuccess}
+              />
+            </div>
+          </div>
+        </div>
+
         <TokenStatsDialog
           open={showTokenStats}
           onOpenChange={setShowTokenStats}
@@ -356,6 +386,7 @@ const Index = () => {
           open={showSubscriptionDialog}
           onOpenChange={setShowSubscriptionDialog}
           onSubscribe={handleSubscribe}
+          userProfile={userProfile}
         />
       </div>
     </CRTEffect>
