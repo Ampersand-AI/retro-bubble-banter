@@ -12,14 +12,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabase";
 
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAuthSuccess: (userProfile: {
+    id: string;
     email: string;
-    isSubscribed: boolean;
-    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+    is_subscribed: boolean;
+    subscription_tier?: 'free' | 'pro' | 'enterprise';
   }) => void;
 }
 
@@ -34,28 +36,52 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Here you would implement actual sign-in logic
-      // For now, we'll just simulate a successful sign-in
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a user profile
-      const userProfile = {
+      console.log('Attempting sign in for email:', email);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        isSubscribed: false,
-        subscriptionTier: 'free' as const
-      };
-      
-      onAuthSuccess(userProfile);
+        password,
+      });
+
+      if (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
+
+      if (!data.user) {
+        console.error('No user data returned after sign in');
+        throw new Error('No user data returned');
+      }
+
+      console.log('Sign in successful, fetching user profile');
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
+      }
+
+      if (!profile) {
+        console.error('No profile found for user');
+        throw new Error('No profile found');
+      }
+
+      console.log('Profile fetched successfully:', profile);
+      onAuthSuccess(profile);
       onOpenChange(false);
       
       toast({
         title: "Success",
         description: "You have successfully signed in!",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Sign in process failed:', error);
       toast({
         title: "Error",
-        description: "Failed to sign in. Please try again.",
+        description: error.message || "Failed to sign in. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -77,28 +103,56 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Here you would implement actual sign-up logic
-      // For now, we'll just simulate a successful sign-up
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create a user profile
-      const userProfile = {
+      console.log('Attempting sign up for email:', email);
+      const { data, error } = await supabase.auth.signUp({
         email,
-        isSubscribed: false,
-        subscriptionTier: 'free' as const
-      };
-      
-      onAuthSuccess(userProfile);
+        password,
+      });
+
+      if (error) {
+        console.error('Sign up error:', error);
+        throw error;
+      }
+
+      if (!data.user) {
+        console.error('No user data returned after sign up');
+        throw new Error('No user data returned');
+      }
+
+      console.log('Sign up successful, waiting for profile creation');
+      // Wait for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('Fetching user profile');
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
+      }
+
+      if (!profile) {
+        console.error('No profile found for user');
+        throw new Error('No profile found');
+      }
+
+      console.log('Profile fetched successfully:', profile);
+      onAuthSuccess(profile);
       onOpenChange(false);
       
       toast({
         title: "Success",
         description: "Account created successfully!",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Sign up process failed:', error);
       toast({
         title: "Error",
-        description: "Failed to create account. Please try again.",
+        description: error.message || "Failed to create account. Please try again.",
         variant: "destructive",
       });
     } finally {
