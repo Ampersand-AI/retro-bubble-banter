@@ -1,255 +1,141 @@
-
 import React from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { Copy, Share2, Printer, X } from 'lucide-react';
-import { AIModel } from './ModelSelect';
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
+import { LogOut, User, Crown, LogIn } from 'lucide-react';
 
 interface TokenStatsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  messages: Array<{
-    id: number;
-    text: string;
-    isAi: boolean;
-    tokenCount?: {
-      input: number;
-      output: number;
-    };
-  }>;
+  onLogout: () => void;
+  onSignIn: () => void;
+  userProfile: {
+    email: string;
+    isSubscribed: boolean;
+    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+  };
+  tokenUsage: {
+    total: number;
+    limit: number;
+    remaining: number;
+  };
+  isAuthenticated: boolean;
 }
 
-const TokenStatsDialog = ({ open, onOpenChange, messages }: TokenStatsDialogProps) => {
-  // Calculate token stats by model
-  const tokenStatsByModel: Record<AIModel | string, { input: number; output: number }> = {};
-  let totalInput = 0;
-  let totalOutput = 0;
+const TokenStatsDialog = ({ 
+  open, 
+  onOpenChange, 
+  onLogout,
+  onSignIn,
+  userProfile,
+  tokenUsage,
+  isAuthenticated
+}: TokenStatsDialogProps) => {
+  const usagePercentage = (tokenUsage.total / tokenUsage.limit) * 100;
 
-  messages.forEach(message => {
-    if (message.tokenCount) {
-      // Extract model information (if available)
-      let modelName: string = 'unknown';
-      
-      // Check if the message is about switching to a specific model
-      if (message.isAi && message.text.startsWith('Switched to')) {
-        const modelMatch = message.text.match(/Switched to (\w+) model/i);
-        if (modelMatch && modelMatch[1]) {
-          modelName = modelMatch[1].toLowerCase();
-        }
-      } else {
-        // Try to infer model from previous messages
-        for (let i = messages.indexOf(message) - 1; i >= 0; i--) {
-          const prevMessage = messages[i];
-          if (prevMessage.isAi && prevMessage.text.startsWith('Switched to')) {
-            const modelMatch = prevMessage.text.match(/Switched to (\w+) model/i);
-            if (modelMatch && modelMatch[1]) {
-              modelName = modelMatch[1].toLowerCase();
-              break;
-            }
-          }
-        }
-      }
-
-      // Add to stats
-      if (!tokenStatsByModel[modelName]) {
-        tokenStatsByModel[modelName] = { input: 0, output: 0 };
-      }
-      
-      tokenStatsByModel[modelName].input += message.tokenCount.input;
-      tokenStatsByModel[modelName].output += message.tokenCount.output;
-      
-      totalInput += message.tokenCount.input;
-      totalOutput += message.tokenCount.output;
-    }
-  });
-
-  // Current date and time for receipt
-  const now = new Date();
-  const dateTimeString = now.toLocaleString();
-
-  const copyToClipboard = () => {
-    let text = "ZACK AI TOKEN USAGE STATISTICS\n\n";
-    
-    Object.entries(tokenStatsByModel).forEach(([model, stats]) => {
-      text += `${model.toUpperCase()} MODEL\n`;
-      text += `Input: ${stats.input} tokens\n`;
-      text += `Output: ${stats.output} tokens\n`;
-      text += `Total: ${stats.input + stats.output} tokens\n\n`;
-    });
-    
-    text += "GRAND TOTAL\n";
-    text += `Input: ${totalInput} tokens\n`;
-    text += `Output: ${totalOutput} tokens\n`;
-    text += `Total: ${totalInput + totalOutput} tokens\n\n`;
-    text += `Generated: ${dateTimeString}`;
-    
-    navigator.clipboard.writeText(text);
+  const handleLogout = () => {
+    onLogout();
+    onOpenChange(false);
     toast({
-      title: "Copied to clipboard",
-      description: "Token usage statistics have been copied to clipboard",
+      title: "Logged out",
+      description: "You have been successfully logged out.",
     });
   };
 
-  const printStats = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Zack AI Token Usage</title>
-            <style>
-              body { font-family: monospace; padding: 20px; color: #e6e6e6; background-color: #1a1c21; }
-              .container { max-width: 500px; margin: 0 auto; }
-              .box { border: 1px solid #00ffff; padding: 16px; margin-bottom: 20px; border-radius: 8px; }
-              .title { color: #00ffff; text-align: center; margin-bottom: 24px; }
-              .model-name { color: #00ffff; font-size: 18px; margin-bottom: 8px; }
-              .input { color: #ff4040; }
-              .output { color: #ff8c00; }
-              .total { color: #00ff00; }
-              .footer { text-align: center; margin-top: 30px; font-size: 12px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <h1 class="title">Zack AI Token Usage Statistics</h1>
-      `);
-      
-      Object.entries(tokenStatsByModel).forEach(([model, stats]) => {
-        printWindow.document.write(`
-          <div class="box">
-            <h2 class="model-name">${model === 'unknown' ? 'Default' : model.charAt(0).toUpperCase() + model.slice(1)} Model</h2>
-            <p class="input">Input: ${stats.input} tokens</p>
-            <p class="output">Output: ${stats.output} tokens</p>
-            <p class="total">Total: ${stats.input + stats.output} tokens</p>
-          </div>
-        `);
-      });
-      
-      printWindow.document.write(`
-          <div class="box">
-            <h2 class="model-name">Grand Total</h2>
-            <p class="input">Input: ${totalInput} tokens</p>
-            <p class="output">Output: ${totalOutput} tokens</p>
-            <p class="total">Total: ${totalInput + totalOutput} tokens</p>
-          </div>
-          <div class="footer">Generated: ${dateTimeString}</div>
-        </div>
-        </body>
-        </html>
-      `);
-      
-      printWindow.document.close();
-      setTimeout(() => {
-        printWindow.print();
-      }, 500);
-    }
-  };
-
-  const shareStats = async () => {
-    if (navigator.share) {
-      try {
-        let text = "ZACK AI TOKEN USAGE STATISTICS\n\n";
-        
-        Object.entries(tokenStatsByModel).forEach(([model, stats]) => {
-          text += `${model.toUpperCase()} MODEL\n`;
-          text += `Input: ${stats.input} tokens\n`;
-          text += `Output: ${stats.output} tokens\n`;
-          text += `Total: ${stats.input + stats.output} tokens\n\n`;
-        });
-        
-        text += "GRAND TOTAL\n";
-        text += `Input: ${totalInput} tokens\n`;
-        text += `Output: ${totalOutput} tokens\n`;
-        text += `Total: ${totalInput + totalOutput} tokens\n\n`;
-        text += `Generated: ${dateTimeString}`;
-        
-        await navigator.share({
-          title: 'Zack AI Token Usage',
-          text: text
-        });
-      } catch (error) {
-        toast({
-          title: "Sharing failed",
-          description: "Could not share the token statistics",
-          variant: "destructive"
-        });
-      }
-    } else {
-      toast({
-        title: "Sharing not supported",
-        description: "Your browser doesn't support the Web Share API",
-        variant: "destructive"
-      });
-    }
+  const handleSignIn = () => {
+    onSignIn();
+    onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6 max-w-md">
-        <DialogHeader className="flex justify-between items-center">
-          <DialogTitle className="text-xl font-pixel mb-4 text-center">Token Usage Statistics</DialogTitle>
-          <DialogClose className="absolute right-4 top-4 text-amp-gray hover:text-amp-cyan">
-            <X size={18} />
-          </DialogClose>
+        <DialogHeader>
+          <DialogTitle className="text-xl font-pixel mb-2 text-center">User Profile & Token Usage</DialogTitle>
+          <DialogDescription className="text-center text-amp-gray">
+            Manage your account and monitor token usage
+          </DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-4">
-          {Object.entries(tokenStatsByModel).map(([model, stats]) => (
-            <div key={model} className="border border-amp-cyan p-3 rounded">
-              <h3 className="text-lg capitalize mb-2">{model === 'unknown' ? 'Default' : model} Model</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="text-red-500">Input: {stats.input} tokens</div>
-                <div className="text-orange-500">Output: {stats.output} tokens</div>
-                <div className="text-amp-cyan col-span-2">Total: {stats.input + stats.output} tokens</div>
+
+        {/* User Profile Section */}
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center space-x-3 p-3 bg-amp-dark-blue rounded-lg border border-amp-cyan">
+            <User className="w-5 h-5 text-amp-cyan" />
+            <div>
+              <p className="text-sm font-mono">{userProfile.email || 'Not signed in'}</p>
+              <div className="flex items-center space-x-2">
+                {isAuthenticated ? (
+                  userProfile.isSubscribed ? (
+                    <>
+                      <Crown className="w-4 h-4 text-yellow-400" />
+                      <span className="text-sm text-yellow-400">
+                        {userProfile.subscriptionTier?.charAt(0).toUpperCase()}{userProfile.subscriptionTier?.slice(1)} Plan
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm text-amp-gray">Free Plan</span>
+                  )
+                ) : (
+                  <span className="text-sm text-amp-gray">No active plan</span>
+                )}
               </div>
             </div>
-          ))}
-          
-          <div className="border-2 border-amp-cyan p-3 rounded mt-4 bg-amp-blue/50">
-            <h3 className="text-lg font-bold mb-2">Grand Total</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="text-red-500">Input: {totalInput} tokens</div>
-              <div className="text-orange-500">Output: {totalOutput} tokens</div>
-              <div className="text-green-500 font-bold col-span-2">
-                Total: {totalInput + totalOutput} tokens
-              </div>
-            </div>
-          </div>
-          
-          <div className="text-xs text-amp-gray mt-2 text-center">
-            Generated: {dateTimeString}
-          </div>
-          
-          <div className="flex justify-center space-x-4 mt-4">
-            <button 
-              onClick={copyToClipboard}
-              className="flex items-center space-x-1 text-amp-cyan hover:text-amp-gray transition-colors"
-            >
-              <Copy size={16} />
-              <span>Copy</span>
-            </button>
-            <button 
-              onClick={shareStats}
-              className="flex items-center space-x-1 text-amp-cyan hover:text-amp-gray transition-colors"
-            >
-              <Share2 size={16} />
-              <span>Share</span>
-            </button>
-            <button 
-              onClick={printStats}
-              className="flex items-center space-x-1 text-amp-cyan hover:text-amp-gray transition-colors"
-            >
-              <Printer size={16} />
-              <span>Print</span>
-            </button>
           </div>
         </div>
+
+        {/* Token Usage Section */}
+        {isAuthenticated && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-amp-cyan">Token Usage</span>
+                <span className="text-amp-gray">
+                  {tokenUsage.total.toLocaleString()} / {tokenUsage.limit.toLocaleString()}
+                </span>
+              </div>
+              <Progress value={usagePercentage} className="h-2 bg-amp-dark-blue" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="bg-amp-dark-blue p-3 rounded-lg border border-amp-cyan">
+                <p className="text-amp-gray">Total Used</p>
+                <p className="text-amp-cyan font-mono">{tokenUsage.total.toLocaleString()}</p>
+              </div>
+              <div className="bg-amp-dark-blue p-3 rounded-lg border border-amp-cyan">
+                <p className="text-amp-gray">Remaining</p>
+                <p className="text-amp-cyan font-mono">{tokenUsage.remaining.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <DialogFooter className="mt-6">
+          {isAuthenticated ? (
+            <Button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSignIn}
+              className="bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Sign In
+            </Button>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
