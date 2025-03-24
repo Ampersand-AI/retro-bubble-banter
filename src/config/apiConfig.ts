@@ -4,7 +4,9 @@
 export const API_KEYS = {
   openai: import.meta.env.VITE_OPENAI_API_KEY,
   claude: import.meta.env.VITE_CLAUDE_API_KEY,
-  gemini: import.meta.env.VITE_GEMINI_API_KEY
+  gemini: import.meta.env.VITE_GEMINI_API_KEY,
+  deepseek: import.meta.env.VITE_DEEPSEEK_API_KEY,
+  grok: import.meta.env.VITE_GROK_API_KEY
 };
 
 // Validate that all required environment variables are present
@@ -23,7 +25,9 @@ if (missingKeys.length > 0) {
 export const DEFAULT_SUBMODELS = {
   openai: 'gpt-4o',
   claude: 'claude-3-opus',
-  gemini: 'gemini-1.5-pro'
+  gemini: 'gemini-1.5-pro',
+  deepseek: 'deepseek-chat',
+  grok: 'grok-1'
 };
 
 export type Message = {
@@ -36,4 +40,4 @@ export type Message = {
   };
 };
 
-export type AIModel = 'openai' | 'claude' | 'gemini';
+export type AIModel = 'openai' | 'claude' | 'gemini' | 'deepseek' | 'grok';

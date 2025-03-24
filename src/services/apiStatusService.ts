@@ -1,4 +1,3 @@
-
 import { API_KEYS } from '../config/apiConfig';
 
 // Test OpenAI API availability
@@ -69,6 +68,48 @@ export const testGeminiApi = async (): Promise<boolean> => {
     return response.status === 200;
   } catch (error) {
     console.error("Gemini API error:", error);
+    return false;
+  }
+};
+
+export const testDeepSeekApi = async (): Promise<boolean> => {
+  try {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEYS.deepseek}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: 'test' }],
+        max_tokens: 1
+      })
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('DeepSeek API test failed:', error);
+    return false;
+  }
+};
+
+export const testGrokApi = async (): Promise<boolean> => {
+  try {
+    const response = await fetch('https://api.grok.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEYS.grok}`
+      },
+      body: JSON.stringify({
+        model: 'grok-1',
+        messages: [{ role: 'user', content: 'test' }],
+        max_tokens: 1
+      })
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('Grok API test failed:', error);
     return false;
   }
 };

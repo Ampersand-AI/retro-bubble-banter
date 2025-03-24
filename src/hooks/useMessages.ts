@@ -1,8 +1,13 @@
-
 import { useState, useCallback } from 'react';
 import { Message, AIModel } from '../config/apiConfig';
 import { estimateTokens, checkModelIdentityQuestion, getIdentityResponse } from '../utils/tokenUtils';
-import { fetchOpenAIResponse, fetchClaudeResponse, fetchGeminiResponse } from '../services/apiService';
+import { 
+  fetchOpenAIResponse, 
+  fetchClaudeResponse, 
+  fetchGeminiResponse,
+  fetchDeepSeekResponse,
+  fetchGrokResponse 
+} from '../services/apiService';
 
 export const useMessages = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -98,6 +103,12 @@ export const useMessages = () => {
           break;
         case 'gemini':
           response = await fetchGeminiResponse(message, selectedSubModel);
+          break;
+        case 'deepseek':
+          response = await fetchDeepSeekResponse(message, selectedSubModel);
+          break;
+        case 'grok':
+          response = await fetchGrokResponse(message, selectedSubModel);
           break;
         default:
           // This shouldn't happen with TypeScript's type checking

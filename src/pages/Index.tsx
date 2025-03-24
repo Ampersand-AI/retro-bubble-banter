@@ -9,7 +9,13 @@ import TokenStatsDialog from '../components/TokenStatsDialog';
 import AuthDialog from '../components/AuthDialog';
 import SubscriptionDialog from '../components/SubscriptionDialog';
 import { AIModel, DEFAULT_SUBMODELS } from '../config/apiConfig';
-import { testOpenAIApi, testClaudeApi, testGeminiApi } from '../services/apiStatusService';
+import { 
+  testOpenAIApi, 
+  testClaudeApi, 
+  testGeminiApi,
+  testDeepSeekApi,
+  testGrokApi 
+} from '../services/apiStatusService';
 import { useMessages } from '../hooks/useMessages';
 import { supabase, UserProfile } from '../lib/supabase';
 
@@ -26,7 +32,9 @@ const Index = () => {
   const [apiStatus, setApiStatus] = useState<{[key in AIModel]: boolean}>({
     openai: false,
     claude: false,
-    gemini: false
+    gemini: false,
+    deepseek: false,
+    grok: false
   });
   const [showApiStatus, setShowApiStatus] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -71,16 +79,20 @@ const Index = () => {
     const validateApis = async () => {
       try {
         // Test APIs in parallel for better performance
-        const [openaiStatus, claudeStatus, geminiStatus] = await Promise.all([
+        const [openaiStatus, claudeStatus, geminiStatus, deepseekStatus, grokStatus] = await Promise.all([
           testOpenAIApi(),
           testClaudeApi(),
-          testGeminiApi()
+          testGeminiApi(),
+          testDeepSeekApi(),
+          testGrokApi()
         ]);
         
         setApiStatus({
           openai: openaiStatus,
           claude: claudeStatus,
-          gemini: geminiStatus
+          gemini: geminiStatus,
+          deepseek: deepseekStatus,
+          grok: grokStatus
         });
       } catch (error) {
         console.error("Error validating APIs:", error);

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Select,
@@ -7,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { AIModel } from './ModelSelect';
+import { AIModel } from '../config/apiConfig';
 
 interface ModelOption {
   value: string;
@@ -37,6 +36,16 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
       { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
       { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
       { value: 'gemini-1.0', label: 'Gemini 1.0' }
+    ],
+    deepseek: [
+      { value: 'deepseek-chat', label: 'DeepSeek Chat' },
+      { value: 'deepseek-coder', label: 'DeepSeek Coder' },
+      { value: 'deepseek-math', label: 'DeepSeek Math' }
+    ],
+    grok: [
+      { value: 'grok-1', label: 'Grok 1' },
+      { value: 'grok-1.5', label: 'Grok 1.5' },
+      { value: 'grok-2', label: 'Grok 2' }
     ]
   };
 

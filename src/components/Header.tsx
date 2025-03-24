@@ -1,8 +1,7 @@
 import React from 'react';
 import { Menu, BarChart3 } from 'lucide-react';
-import { AIModel } from './ModelSelect';
+import { AIModel } from '../config/apiConfig';
 import SystemArtifact from './SystemArtifact';
-import HeaderAPIStatus from './HeaderAPIStatus';
 import ModelSelect from './ModelSelect';
 
 interface HeaderProps {
@@ -32,11 +31,6 @@ const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStat
 
         <div className="flex items-center space-x-4">
           <SystemArtifact />
-          <HeaderAPIStatus 
-            apiStatus={apiStatus} 
-            selectedModel={selectedModel}
-            onModelChange={onModelChange}
-          />
           <ModelSelect
             selectedModel={selectedModel}
             onModelChange={onModelChange}
