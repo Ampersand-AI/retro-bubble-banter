@@ -17,7 +17,7 @@ export const useMessages = () => {
       isAi: true,
       tokenCount: {
         input: 0,
-        output: estimateTokens("Welcome to Rovyk by Ampersand! You can experience various premium AI models at a fraction of the cost.")
+        output: 0  // Set to 0 to not count tokens for welcome message
       }
     }
   ]);
@@ -36,7 +36,7 @@ export const useMessages = () => {
       isAi: true,
       tokenCount: {
         input: 0,
-        output: estimateTokens(`Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`)
+        output: 0  // Set to 0 to not count tokens for model switch messages
       }
     };
     
