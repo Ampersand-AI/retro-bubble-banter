@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import { Clipboard } from 'lucide-react';
@@ -22,12 +21,38 @@ interface ChatAreaProps {
 
 const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom when messages update
+  // Scroll to bottom when messages update or typing status changes
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    const scrollToBottom = () => {
+      if (chatEndRef.current && scrollAreaRef.current) {
+        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (scrollContainer) {
+          // Force scroll to bottom
+          scrollContainer.scrollTo({
+            top: scrollContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    };
+
+    // Scroll immediately
+    scrollToBottom();
+
+    // If AI is typing, set up an interval to keep scrolling
+    let intervalId: NodeJS.Timeout | null = null;
+    if (isTyping) {
+      intervalId = setInterval(scrollToBottom, 100);
     }
+
+    // Cleanup
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [messages, isTyping]);
 
   const copyMessage = (text: string) => {
@@ -40,12 +65,12 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex justify-center items-center h-[calc(100vh-4rem)] pt-16">
-      <div className="h-full max-w-4xl max-h-[750px] overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-4rem)] pr-[25px]">
-          <div className="px-4 py-4">
+    <div className="flex justify-center items-center h-[calc(100vh-12rem)] pt-16">
+      <div className="h-full w-full max-w-4xl overflow-hidden">
+        <ScrollArea ref={scrollAreaRef} className="h-full pr-[25px]">
+          <div className="px-4 py-6">
             {messages.map((message) => (
-              <div key={message.id} className="relative group">
+              <div key={message.id} className="relative group mb-4">
                 <MessageBubble
                   message={message.text}
                   isAi={message.isAi}
@@ -62,13 +87,15 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
               </div>
             ))}
             {isTyping && (
-              <MessageBubble
-                message=""
-                isAi={true}
-                isTyping={true}
-              />
+              <div className="mb-4">
+                <MessageBubble
+                  message=""
+                  isAi={true}
+                  isTyping={true}
+                />
+              </div>
             )}
-            <div ref={chatEndRef} />
+            <div ref={chatEndRef} className="h-4" />
           </div>
         </ScrollArea>
       </div>
