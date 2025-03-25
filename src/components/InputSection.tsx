@@ -145,7 +145,7 @@ const InputSection = ({
               }}
               onKeyDown={handleKeyDown}
               placeholder={isAuthenticated ? "Type your message..." : "Sign in to start chatting..."}
-              className={`w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray caret-[4px] ${!isTyping ? 'animate-blink' : ''}`}
+              className={`w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray caret-4 ${!isTyping ? 'animate-blink' : ''}`}
             />
           </div>
           
