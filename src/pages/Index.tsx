@@ -165,7 +165,7 @@ const Index = () => {
       return;
     }
 
-    // Get the current message's token count
+    // Get the current message's token count (only count user input)
     const userTokenCount = Math.ceil(message.length / 4);
     
     // Check if we have enough tokens
@@ -174,7 +174,7 @@ const Index = () => {
       return;
     }
 
-    // Update token usage in Supabase
+    // Update token usage in Supabase (only count user input)
     const newTotal = tokenUsage.total + userTokenCount;
     const newRemaining = Math.max(0, tokenUsage.limit - newTotal);
     
@@ -213,8 +213,11 @@ const Index = () => {
     const updateTokenUsage = async () => {
       if (messages.length > 0 && session?.user) {
         const lastMessage = messages[messages.length - 1];
-        // Skip the first greeting message
-        if (lastMessage.isAi && lastMessage.tokenCount && messages.length > 1) {
+        // Skip the first greeting message and model switch messages
+        if (lastMessage.isAi && lastMessage.tokenCount && messages.length > 1 && 
+            !lastMessage.text.includes("Welcome to Rovyk") && 
+            !lastMessage.text.includes("Switched to")) {
+          // Only count AI output tokens
           const newTotal = tokenUsage.total + lastMessage.tokenCount.output;
           const newRemaining = Math.max(0, tokenUsage.limit - newTotal);
           

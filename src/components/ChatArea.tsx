@@ -41,8 +41,8 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
 
   return (
     <div className="flex justify-center items-center h-[calc(100vh-4rem)] pt-16">
-      <div className="h-full max-w-4xl max-h-[750px] overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-4rem)] pr-[25px]">
+      <div className="max-h-[calc(100vh-8rem)] max-w-4xl overflow-hidden">
+        <ScrollArea className="h-[calc(100vh-8rem)] pr-[25px]">
           <div className="px-4 py-4">
             {messages.map((message) => (
               <div key={message.id} className="relative group">

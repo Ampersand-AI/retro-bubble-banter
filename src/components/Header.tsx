@@ -1,5 +1,4 @@
-import React from 'react';
-import { Menu, BarChart3 } from 'lucide-react';
+import { UserCog } from 'lucide-react';
 import { AIModel } from '../config/apiConfig';
 import SystemArtifact from './SystemArtifact';
 import ModelSelect from './ModelSelect';
@@ -28,7 +27,6 @@ const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStat
           <img src="/images/rovyk.png" alt="Rovyk" className="w-10 h-10" />
           <h1 className="font-pixel text-md md:text-xl text-amp-cyan tracking-wider">Rovyk</h1>
         </div>
-
         <div className="flex items-center space-x-4">
           <SystemArtifact />
           <ModelSelect
@@ -36,12 +34,12 @@ const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStat
             onModelChange={onModelChange}
             apiStatus={apiStatus}
           />
-          <button
+           <button
             onClick={onTokenStatsClick}
             className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
           >
-            <BarChart3 className="w-5 h-5" />
-            <span className="text-sm">Token Stats</span>
+            <UserCog className="w-5 h-5" />
+            <span className="text-sm">Account</span>
           </button>
         </div>
       </div>

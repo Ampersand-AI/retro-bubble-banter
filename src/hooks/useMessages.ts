@@ -17,7 +17,7 @@ export const useMessages = () => {
       isAi: true,
       tokenCount: {
         input: 0,
-        output: estimateTokens("Welcome to Rovyk by Ampersand! You can experience various premium AI models at a fraction of the cost.")
+        output: 0  // Set to 0 to not count the greeting message
       }
     }
   ]);
@@ -36,7 +36,7 @@ export const useMessages = () => {
       isAi: true,
       tokenCount: {
         input: 0,
-        output: estimateTokens(`Switched to ${model.charAt(0).toUpperCase() + model.slice(1)} model.`)
+        output: 0  // Set to 0 to not count the model switch message
       }
     };
     
@@ -60,7 +60,7 @@ export const useMessages = () => {
       isAi: false,
       tokenCount: {
         input: userTokenCount,
-        output: 0
+        output: 0  // User messages always have 0 output tokens
       }
     });
     
@@ -80,7 +80,7 @@ export const useMessages = () => {
             text: identityResponse,
             isAi: true,
             tokenCount: {
-              input: userTokenCount,
+              input: 0,  // AI messages always have 0 input tokens
               output: estimateTokens(identityResponse)
             }
           });
@@ -119,7 +119,10 @@ export const useMessages = () => {
         id: userMessageId + 1,
         text: response.text,
         isAi: true,
-        tokenCount: response.tokenCount
+        tokenCount: {
+          input: 0,  // AI messages always have 0 input tokens
+          output: response.tokenCount.output
+        }
       });
       
       setMessageIdCounter(userMessageId + 2);
@@ -131,7 +134,7 @@ export const useMessages = () => {
         text: "Sorry, I encountered an error while processing your request. Please try again.",
         isAi: true,
         tokenCount: {
-          input: userTokenCount,
+          input: 0,  // AI messages always have 0 input tokens
           output: estimateTokens("Sorry, I encountered an error while processing your request. Please try again.")
         }
       });
