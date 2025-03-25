@@ -297,11 +297,10 @@ const Index = () => {
     });
   };
 
-  const handleSubscribe = () => {
-    // Implement subscription logic here
+  const handleSubscribe = async (tier: 'plus' | 'ultra') => {
     toast({
       title: "Coming Soon",
-      description: "Subscription feature will be available soon!",
+      description: `The ${tier.charAt(0).toUpperCase() + tier.slice(1)} subscription will be available soon!`,
     });
     setShowSubscriptionDialog(false);
   };
@@ -330,6 +329,7 @@ const Index = () => {
           apiStatus={apiStatus}
           messages={messages}
           onTokenStatsClick={() => setShowTokenStats(true)}
+          onSubscribeClick={() => setShowSubscriptionDialog(true)}
         />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         <ChatArea messages={messages} isTyping={isTyping} />

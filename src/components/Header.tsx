@@ -1,4 +1,4 @@
-import { UserCog } from 'lucide-react';
+import { UserCog, Crown } from 'lucide-react';
 import { AIModel } from '../config/apiConfig';
 import SystemArtifact from './SystemArtifact';
 import ModelSelect from './ModelSelect';
@@ -17,9 +17,17 @@ interface HeaderProps {
     };
   }>;
   onTokenStatsClick: () => void;
+  onSubscribeClick: () => void;
 }
 
-const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStatsClick }: HeaderProps) => {
+const Header = ({ 
+  selectedModel, 
+  onModelChange, 
+  apiStatus, 
+  messages, 
+  onTokenStatsClick,
+  onSubscribeClick 
+}: HeaderProps) => {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-amp-blue z-50 animate-fade-in-down">
       <div className="flex items-center justify-between h-full px-4 md:px-8">
@@ -34,7 +42,14 @@ const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStat
             onModelChange={onModelChange}
             apiStatus={apiStatus}
           />
-           <button
+          <button
+            onClick={onSubscribeClick}
+            className="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 transition-colors bg-amp-dark-blue px-3 py-1.5 rounded-md border border-yellow-400/30"
+          >
+            <Crown className="w-4 h-4" />
+            <span className="text-sm font-pixel">Upgrade Now</span>
+          </button>
+          <button
             onClick={onTokenStatsClick}
             className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
           >
