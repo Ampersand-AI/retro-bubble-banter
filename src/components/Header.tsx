@@ -18,6 +18,7 @@ interface HeaderProps {
   }>;
   onTokenStatsClick: () => void;
   onSubscribeClick: () => void;
+  isAuthenticated: boolean;
 }
 
 const Header = ({ 
@@ -26,7 +27,8 @@ const Header = ({
   apiStatus, 
   messages, 
   onTokenStatsClick,
-  onSubscribeClick 
+  onSubscribeClick,
+  isAuthenticated 
 }: HeaderProps) => {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-amp-blue z-50 animate-fade-in-down">
@@ -35,8 +37,10 @@ const Header = ({
           <img src="/images/rovyk.png" alt="Rovyk" className="w-10 h-10" />
           <h1 className="font-pixel text-md md:text-xl text-amp-cyan tracking-wider">Rovyk</h1>
         </div>
-        <div className="flex items-center space-x-4">
-          <SystemArtifact />
+        <div className="flex items-center space-x-2 md:space-x-4">
+          <div className="hidden md:block">
+            <SystemArtifact />
+          </div>
           <ModelSelect
             selectedModel={selectedModel}
             onModelChange={onModelChange}
@@ -44,7 +48,7 @@ const Header = ({
           />
           <button
             onClick={onSubscribeClick}
-            className="flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 transition-colors bg-amp-dark-blue px-3 py-1.5 rounded-md border border-yellow-400/30"
+            className="hidden md:flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 transition-colors bg-amp-dark-blue px-3 py-1.5 rounded-md border border-yellow-400/30"
           >
             <Crown className="w-4 h-4" />
             <span className="text-sm font-pixel">Upgrade Now</span>
@@ -54,7 +58,7 @@ const Header = ({
             className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
           >
             <UserCog className="w-5 h-5" />
-            <span className="text-sm">Account</span>
+            <span className="text-sm">{isAuthenticated ? 'Account' : 'Sign in'}</span>
           </button>
         </div>
       </div>

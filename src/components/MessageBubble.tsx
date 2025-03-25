@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import TypingIndicator from './TypingIndicator';
 
@@ -16,6 +15,27 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
   const [displayedText, setDisplayedText] = useState('');
   const [isTypingEffect, setIsTypingEffect] = useState(false);
   const [textComplete, setTextComplete] = useState(false);
+
+  const formatMarkdown = (text: string) => {
+    return text
+      // Bold text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      // Italic text
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      // Lists
+      .replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>')
+      // Headers
+      .replace(/^(#{1,6})\s+(.*)$/gm, (match, hashes, content) => {
+        const level = hashes.length;
+        return `<h${level}>${content}</h${level}>`;
+      })
+      // Convert line breaks to <br> for lists
+      .replace(/(<li>.*<\/li>)\n/g, '$1<br>')
+      // Wrap lists in <ul>
+      .replace(/(<li>.*<\/li>.*?)(?=<br>|$)/gs, '<ul>$1</ul>')
+      // Convert remaining line breaks to <br>
+      .replace(/\n/g, '<br>');
+  };
   
   useEffect(() => {
     if (isAi && message && !isTyping && !textComplete) {
@@ -23,11 +43,11 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
       setDisplayedText('');
       
       let i = 0;
-      const speed = 2; // Even faster typing speed (reduced from 5ms to 2ms)
+      const speed = 2;
       
       const typeWriter = () => {
         if (i < message.length) {
-          setDisplayedText(message.substring(0, i + 1)); // Use substring instead of concatenation
+          setDisplayedText(message.substring(0, i + 1));
           i++;
           setTimeout(typeWriter, speed);
         } else {
@@ -48,6 +68,40 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
     };
   }, [message, isAi, isTyping]);
 
+  const renderContent = () => {
+    if (isTyping) {
+      return <TypingIndicator />;
+    }
+
+    if (isAi && isTypingEffect) {
+      return (
+        <>
+          {displayedText}
+          <span className="inline-block w-1 h-4 bg-amp-cyan ml-1 animate-blink"></span>
+        </>
+      );
+    }
+
+    const text = displayedText || message;
+    return (
+      <>
+        <div 
+          className="prose prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ 
+            __html: formatMarkdown(text)
+          }} 
+        />
+        {tokenCount && !isTyping && (
+          <div className="text-xs mt-2">
+            <span className="text-red-500">Input: {tokenCount.input} tokens</span>
+            {' | '}
+            <span className="text-orange-500">Output: {tokenCount.output} tokens</span>
+          </div>
+        )}
+      </>
+    );
+  };
+
   return (
     <div className={`flex items-start mb-4 animate-fade-in-up ${isAi ? 'justify-start' : 'justify-end'}`}>
       {isAi && (
@@ -66,25 +120,7 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
             : 'bg-transparent text-amp-gray'
         } px-3 max-w-[75%] break-words`}
       >
-        {isTyping ? (
-          <TypingIndicator />
-        ) : isAi && isTypingEffect ? (
-          <>
-            {displayedText}
-            <span className="inline-block w-1 h-4 bg-amp-cyan ml-1 animate-blink"></span>
-          </>
-        ) : (
-          <>
-            {displayedText || message}
-            {tokenCount && !isTyping && (
-              <div className="text-xs mt-2">
-                <span className="text-red-500">Input: {tokenCount.input} tokens</span>
-                {' | '}
-                <span className="text-orange-500">Output: {tokenCount.output} tokens</span>
-              </div>
-            )}
-          </>
-        )}
+        {renderContent()}
       </div>
     </div>
   );

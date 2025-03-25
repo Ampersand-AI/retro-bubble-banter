@@ -42,6 +42,7 @@ const Index = () => {
   const [userProfile, setUserProfile] = useState<UserProfile>({
     id: '',
     email: '',
+    full_name: '',
     is_subscribed: false,
     subscription_tier: 'free',
     token_usage: {
@@ -276,12 +277,33 @@ const Index = () => {
     }
   };
 
+  const handleInputAuthSuccess = (userProfile: {
+    email: string;
+    isSubscribed: boolean;
+    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+  }) => {
+    const newProfile: UserProfile = {
+      id: '',  // This will be set by Supabase
+      email: userProfile.email,
+      full_name: '',  // This will be set by the user later
+      is_subscribed: userProfile.isSubscribed,
+      subscription_tier: userProfile.subscriptionTier || 'free',
+      token_usage: {
+        total: 0,
+        limit: 5000,
+        remaining: 5000
+      }
+    };
+    handleAuthSuccess(newProfile);
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setIsAuthenticated(false);
     setUserProfile({
       id: '',
       email: '',
+      full_name: '',
       is_subscribed: false,
       subscription_tier: 'free',
       token_usage: {
@@ -330,6 +352,7 @@ const Index = () => {
           messages={messages}
           onTokenStatsClick={() => setShowTokenStats(true)}
           onSubscribeClick={() => setShowSubscriptionDialog(true)}
+          isAuthenticated={isAuthenticated}
         />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         <ChatArea messages={messages} isTyping={isTyping} />
@@ -339,7 +362,7 @@ const Index = () => {
           selectedSubModel={selectedSubModel}
           onSubModelChange={handleSubModelChange}
           isAuthenticated={isAuthenticated}
-          onAuthSuccess={handleAuthSuccess}
+          onAuthSuccess={handleInputAuthSuccess}
         />
         <TokenStatsDialog
           open={showTokenStats}
@@ -359,6 +382,7 @@ const Index = () => {
           open={showSubscriptionDialog}
           onOpenChange={setShowSubscriptionDialog}
           onSubscribe={handleSubscribe}
+          userId={session?.user?.id || ''}
         />
       </div>
     </CRTEffect>

@@ -1,7 +1,7 @@
 import React, { useState, KeyboardEvent, useRef, useEffect } from 'react';
 import { Send, Mic, Paperclip } from 'lucide-react';
 import ModelDropdown from './ModelDropdown';
-import { AIModel } from './ModelSelect';
+import { AIModel } from '../config/apiConfig';
 import AuthDialog from './AuthDialog';
 
 interface InputSectionProps {
@@ -110,12 +110,17 @@ const InputSection = ({
   };
 
   const handleAuthSuccess = (userProfile: {
+    id: string;
     email: string;
-    isSubscribed: boolean;
-    subscriptionTier?: 'free' | 'pro' | 'enterprise';
+    is_subscribed: boolean;
+    subscription_tier?: 'free' | 'pro' | 'enterprise';
   }) => {
     if (onAuthSuccess) {
-      onAuthSuccess(userProfile);
+      onAuthSuccess({
+        email: userProfile.email,
+        isSubscribed: userProfile.is_subscribed,
+        subscriptionTier: userProfile.subscription_tier
+      });
     }
     if (message.trim()) {
       onSendMessage(message);

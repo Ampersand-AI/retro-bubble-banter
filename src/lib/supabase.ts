@@ -12,8 +12,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export interface UserProfile {
   id: string;
   email: string;
+  full_name: string;
   is_subscribed: boolean;
-  subscription_tier?: 'free' | 'pro' | 'enterprise';
+  subscription_tier: 'free' | 'pro' | 'enterprise';
   token_usage: {
     total: number;
     limit: number;
