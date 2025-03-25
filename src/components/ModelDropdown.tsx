@@ -33,9 +33,9 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
       { value: 'claude-3-haiku', label: 'Claude 3 Haiku' }
     ],
     gemini: [
-      { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
-      { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
-      { value: 'gemini-1.0', label: 'Gemini 1.0' }
+      { value: 'gemini-2.0-pro', label: 'Gemini 2.0 Flash' },
+      { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash Lite' },
+      { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Flash' }
     ],
     deepseek: [
       { value: 'deepseek-chat', label: 'DeepSeek Chat' },

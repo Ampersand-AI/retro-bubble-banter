@@ -25,7 +25,7 @@ if (missingKeys.length > 0) {
 export const DEFAULT_SUBMODELS = {
   openai: 'gpt-4o',
   claude: 'claude-3-opus',
-  gemini: 'gemini-1.5-pro',
+  gemini: 'gemini-2.0-flash',
   deepseek: 'deepseek-chat',
   grok: 'grok-1'
 };

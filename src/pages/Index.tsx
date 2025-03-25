@@ -27,8 +27,8 @@ interface TokenUsage {
 
 const Index = () => {
   // State for models and API status
-  const [selectedModel, setSelectedModel] = useState<AIModel>('openai');
-  const [selectedSubModel, setSelectedSubModel] = useState<string>(DEFAULT_SUBMODELS.openai);
+  const [selectedModel, setSelectedModel] = useState<AIModel>('gemini');
+  const [selectedSubModel, setSelectedSubModel] = useState<string>(DEFAULT_SUBMODELS.gemini);
   const [apiStatus, setApiStatus] = useState<{[key in AIModel]: boolean}>({
     openai: false,
     claude: false,
