@@ -27,6 +27,25 @@ export const useMessages = () => {
   const [messageIdCounter, setMessageIdCounter] = useState(2);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
+  const startNewChat = useCallback(() => {
+    // Reset messages to just the welcome message
+    setMessages([
+      {
+        id: 1,
+        text: "Welcome to Rovyk by Ampersand! You can experience various premium AI models at a fraction of the cost.",
+        isAi: true,
+        tokenCount: {
+          input: 0,
+          output: 0
+        }
+      }
+    ]);
+    // Reset message counter
+    setMessageIdCounter(2);
+    // Reset conversation ID to start a new conversation
+    setCurrentConversationId(null);
+  }, []);
+
   const addMessage = useCallback(async (message: Message) => {
     console.log('Adding message:', message);
     setMessages(prevMessages => [...prevMessages, message]);
@@ -207,6 +226,7 @@ export const useMessages = () => {
     setMessageIdCounter,
     addModelSwitchMessage,
     handleSendMessage,
-    setMessages: setMessagesWithReset
+    setMessages: setMessagesWithReset,
+    startNewChat
   };
 };

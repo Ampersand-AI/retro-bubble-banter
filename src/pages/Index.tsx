@@ -70,7 +70,8 @@ const Index = () => {
     setMessageIdCounter, 
     addModelSwitchMessage, 
     handleSendMessage,
-    setMessages
+    setMessages: setMessagesWithReset,
+    startNewChat
   } = useMessages();
 
   // Update submodel when the main model changes
@@ -324,8 +325,13 @@ const Index = () => {
 
   const handleSelectChat = (messages: Message[]) => {
     setSelectedChat(messages);
-    setMessages(messages);
+    setMessagesWithReset(messages);
     setShowChatHistory(false);
+  };
+
+  const handleNewChat = () => {
+    startNewChat();
+    setShowChatHistory(false); // Hide chat history when starting a new chat
   };
 
   return (
@@ -338,6 +344,7 @@ const Index = () => {
           messages={messages}
           onTokenStatsClick={() => setShowTokenStats(true)}
           onChatHistoryClick={() => setShowChatHistory(!showChatHistory)}
+          onNewChat={handleNewChat}
         />
         {showApiStatus && <APIStatus apiStatus={apiStatus} />}
         

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, UserCog, History } from 'lucide-react';
+import { Menu, UserCog, History, Plus } from 'lucide-react';
 import { AIModel } from '../config/apiConfig';
 import SystemArtifact from './SystemArtifact';
 import ModelSelect from './ModelSelect';
@@ -19,9 +19,18 @@ interface HeaderProps {
   }>;
   onTokenStatsClick: () => void;
   onChatHistoryClick: () => void;
+  onNewChat: () => void;
 }
 
-const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStatsClick, onChatHistoryClick }: HeaderProps) => {
+const Header = ({ 
+  selectedModel, 
+  onModelChange, 
+  apiStatus, 
+  messages, 
+  onTokenStatsClick, 
+  onChatHistoryClick,
+  onNewChat 
+}: HeaderProps) => {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-amp-blue z-50 animate-fade-in-down">
       <div className="flex items-center justify-between h-full px-4 md:px-8">
@@ -37,6 +46,13 @@ const Header = ({ selectedModel, onModelChange, apiStatus, messages, onTokenStat
             onModelChange={onModelChange}
             apiStatus={apiStatus}
           />
+          <button
+            onClick={onNewChat}
+            className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="text-sm">New Chat</span>
+          </button>
           <button
             onClick={onChatHistoryClick}
             className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
