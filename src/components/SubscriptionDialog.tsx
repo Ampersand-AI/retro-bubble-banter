@@ -26,6 +26,15 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
 
   const handleSubscribe = async (tier: 'plus' | 'ultra') => {
     try {
+      if (!userId) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to continue with your subscription.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setLoading(tier);
       const { sessionId } = await createCheckoutSession(tier, userId);
       
