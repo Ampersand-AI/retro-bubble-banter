@@ -157,7 +157,7 @@ const InputSection = ({
               }}
               onKeyDown={handleKeyDown}
               placeholder={!isTyping ? typewriterText : ""}
-              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray caret-4 [&::placeholder]:animate-none"
+              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray placeholder:text-bold caret-4 [&::placeholder]:animate-none"
             />
           </div>
           

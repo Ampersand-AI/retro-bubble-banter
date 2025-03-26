@@ -60,7 +60,7 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6 max-w-2xl">
+      <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6 max-w-2xl max-h-[100vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-pixel mb-2 text-center flex items-center justify-center gap-2">
             <Crown className="w-6 h-6 text-yellow-400" />
@@ -69,7 +69,6 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
           <DialogDescription className="text-center text-amp-gray">
             Select a plan that best fits your needs
           </DialogDescription>
-          
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
@@ -151,8 +150,8 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
           </div>
         </div>
         <div className="text-xs text-amp-gray- text-center mt-2">
-            Note: Grok and Claude models are coming soon to premium plans
-          </div>
+          Note: Grok and Claude models are coming soon to premium plans
+        </div>
       </DialogContent>
     </Dialog>
   );

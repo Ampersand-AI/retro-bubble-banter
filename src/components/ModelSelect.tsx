@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { AIModel } from '../config/apiConfig';
+import { Bot } from 'lucide-react';
 
 interface ModelSelectProps {
   selectedModel: AIModel;
@@ -20,11 +21,12 @@ const ModelSelect = ({ selectedModel, onModelChange, apiStatus }: ModelSelectPro
       value={selectedModel}
       onValueChange={(value: AIModel) => onModelChange(value)}
     >
-      <SelectTrigger className="w-[120px] bg-amp-blue border-amp-gray text-amp-cyan font-pixel text-xs">
+      <SelectTrigger className="md:w-[120px] bg-amp-blue border-amp-gray text-amp-cyan font-pixel text-xs">
         <SelectValue>
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${apiStatus[selectedModel] ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="capitalize">{selectedModel}</span>
+            <span className="capitalize hidden md:inline">{selectedModel}</span>
+            <Bot className="w-5 h-5 md:hidden" />
           </div>
         </SelectValue>
       </SelectTrigger>
