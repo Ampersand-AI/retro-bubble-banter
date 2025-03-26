@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,10 +23,19 @@ interface SupportDialogProps {
 const SupportDialog = ({ open, onOpenChange, userEmail, userName }: SupportDialogProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: userName || '',
-    email: userEmail || '',
+    name: '',
+    email: '',
     message: ''
   });
+
+  // Update form data when dialog opens or user details change
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      name: userName || '',
+      email: userEmail || ''
+    }));
+  }, [open, userName, userEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +62,7 @@ const SupportDialog = ({ open, onOpenChange, userEmail, userName }: SupportDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-amp-blue border-2 border-amp-cyan p-6">
+      <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6">
         <DialogHeader>
           <DialogTitle className="text-xl font-pixel mb-2 text-center">Support Request</DialogTitle>
           <DialogDescription className="text-center text-amp-gray">
