@@ -17,21 +17,22 @@ export async function sendSupportEmail(data: { name: string; email: string; mess
       throw new Error('Invalid email format');
     }
 
-    // Send email using Resend
-    const response = await resend.emails.send({
-      from: 'Rovyk Support <dev@ampvc.co>',
-      to: ['dev@ampvc.co'],
-      subject: `New Support Request from ${name}`,
-      html: `
-        <h2>New Support Request</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message}</p>
-      `,
+    // Send request to our server
+    const response = await fetch('http://localhost:3001/api/support', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, message }),
     });
 
-    return { success: true, data: response };
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send support request');
+    }
+
+    const result = await response.json();
+    return result;
   } catch (error) {
     console.error('Error sending support email:', error);
     throw error;
