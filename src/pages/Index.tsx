@@ -342,6 +342,10 @@ const Index = () => {
     setShowAuthDialog(true);
   };
 
+  const handleProfileUpdate = (updatedProfile: UserProfile) => {
+    setUserProfile(updatedProfile);
+  };
+
   return (
     <CRTEffect>
       <div className="min-h-screen bg-amp-blue overflow-hidden">
@@ -372,6 +376,7 @@ const Index = () => {
           userProfile={userProfile}
           tokenUsage={tokenUsage}
           isAuthenticated={isAuthenticated}
+          onProfileUpdate={handleProfileUpdate}
         />
         <AuthDialog
           open={showAuthDialog}

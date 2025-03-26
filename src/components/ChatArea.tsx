@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import MessageBubble from './MessageBubble';
 import { Clipboard } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
@@ -21,6 +21,31 @@ interface ChatAreaProps {
 
 const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [inputHeight, setInputHeight] = useState(0);
+
+  // Listen for input height changes
+  useEffect(() => {
+    const handleResize = () => {
+      const inputSection = document.querySelector('.input-section');
+      if (inputSection) {
+        setInputHeight(inputSection.clientHeight);
+      }
+    };
+
+    // Initial measurement
+    handleResize();
+
+    // Create ResizeObserver to watch for height changes
+    const resizeObserver = new ResizeObserver(handleResize);
+    const inputSection = document.querySelector('.input-section');
+    if (inputSection) {
+      resizeObserver.observe(inputSection);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -39,9 +64,9 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex justify-center items-center h-[80vh] pt-6">
-      <div className="max-h-[calc(100vh-8rem)] self-start max-w-4xl overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-8rem)] pr-[25px] pt-12 [&_[data-radix-scroll-area-scrollbar]]:w-1 [&_[data-radix-scroll-area-scrollbar]]:bg-amp-cyan/5 [&_[data-radix-scroll-area-scrollbar]]:hover:bg-amp-cyan/10 [&_[data-radix-scroll-area-scrollbar]]:rounded-none">
+    <div className="flex justify-center items-center" style={{ height: `calc(100vh - ${inputHeight + 64}px)` }}>
+      <div className="h-full self-start max-w-4xl overflow-hidden">
+        <ScrollArea className="h-full pr-[25px] pt-12 [&_[data-radix-scroll-area-scrollbar]]:w-1 [&_[data-radix-scroll-area-scrollbar]]:bg-amp-cyan/5 [&_[data-radix-scroll-area-scrollbar]]:hover:bg-amp-cyan/10 [&_[data-radix-scroll-area-scrollbar]]:rounded-none">
           <div className="px-4 py-4">
             <div className="flex flex-col items-center justify-center mb-8">
               <img 

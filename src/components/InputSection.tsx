@@ -31,7 +31,7 @@ const InputSection = ({
   const [isTyping, setIsTyping] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const placeholderText = isAuthenticated 
     ? "Type your message..." 
@@ -39,12 +39,23 @@ const InputSection = ({
   
   const typewriterText = useTypewriter(placeholderText, 50, 2000);
   
-  // Auto-focus on the input field when component mounts
+  // Auto-focus on the textarea when component mounts
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+    if (textareaRef.current) {
+      textareaRef.current.focus();
     }
   }, []);
+
+  // Auto-resize textarea as content grows
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to auto to get the correct scrollHeight
+      textarea.style.height = 'auto';
+      // Set the height to scrollHeight to fit content
+      textarea.style.height = `${Math.max(40, textarea.scrollHeight)}px`;
+    }
+  }, [message]);
   
   const handleSend = () => {
     if (!isAuthenticated) {
@@ -55,16 +66,20 @@ const InputSection = ({
     if (message.trim()) {
       onSendMessage(message);
       setMessage('');
-      // Re-focus the input after sending
+      // Reset textarea height after sending
+      if (textareaRef.current) {
+        textareaRef.current.style.height = '40px';
+      }
+      // Re-focus the textarea after sending
       setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
+        if (textareaRef.current) {
+          textareaRef.current.focus();
         }
       }, 0);
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -97,16 +112,16 @@ const InputSection = ({
       
       recognition.onend = () => {
         setIsRecording(false);
-        if (inputRef.current) {
-          inputRef.current.focus();
+        if (textareaRef.current) {
+          textareaRef.current.focus();
         }
       };
       
       recognition.onerror = (event) => {
         console.error('Speech recognition error', event.error);
         setIsRecording(false);
-        if (inputRef.current) {
-          inputRef.current.focus();
+        if (textareaRef.current) {
+          textareaRef.current.focus();
         }
       };
       
@@ -137,19 +152,23 @@ const InputSection = ({
 
   return (
     <>
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center px-2">
-        <div className="w-[850px] max-w-[850px] flex items-center">
-          <div className="flex items-center space-x-3 mr-3">
+      <div className="fixed bottom-8 left-0 right-0 flex justify-center px-2 input-section">
+        <div className="w-[850px] max-w-[850px] flex items-end">
+          <div className="flex items-center space-x-3 mr-3 mb-1">
             <Mic 
               className={`w-6 h-6 ${isRecording ? 'text-blue-500' : 'text-blue-400'} hover:text-blue-600 cursor-pointer transition-colors`}
               onClick={handleVoiceToText}
             />
+            <ModelDropdown 
+              selectedModel={selectedModel}
+              selectedSubModel={selectedSubModel}
+              onSubModelChange={onSubModelChange}
+            />  
           </div>
           
-          <div className="flex-1">
-            <input
-              ref={inputRef}
-              type="text"
+          <div className="flex-1 bg-black/30 rounded-lg">
+            <textarea
+              ref={textareaRef}
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value);
@@ -157,23 +176,19 @@ const InputSection = ({
               }}
               onKeyDown={handleKeyDown}
               placeholder={!isTyping ? typewriterText : ""}
-              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray placeholder:text-bold caret-4 [&::placeholder]:animate-none"
+              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray placeholder:text-bold caret-4 [&::placeholder]:animate-none resize-none overflow-hidden min-h-[40px] max-h-[100px]"
+              rows={1}
             />
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-1">
             <button 
               onClick={handleSend}
-              className="ml-1 py-2 px-3 h-[40px] w-[40px] flex items-center justify-center bg-transparent"
+              className="ml-1 py-3 px-3 h-11 w-11 flex items-center justify-center bg-transparent"
               disabled={!message.trim()}
             >
-              <Send className="w-5 h-5 text-amp-cyan" />
+              <Send className="w-6 h-6 text-amp-cyan" />
             </button>
-            <ModelDropdown 
-              selectedModel={selectedModel}
-              selectedSubModel={selectedSubModel}
-              onSubModelChange={onSubModelChange}
-            />
           </div>
         </div>
       </div>

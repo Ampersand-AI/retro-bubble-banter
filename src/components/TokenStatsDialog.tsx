@@ -37,6 +37,7 @@ interface TokenStatsDialogProps {
     remaining: number;
   };
   isAuthenticated: boolean;
+  onProfileUpdate?: (updatedProfile: TokenStatsDialogProps['userProfile']) => void;
 }
 
 const TokenStatsDialog = ({ 
@@ -46,7 +47,8 @@ const TokenStatsDialog = ({
   onSignIn,
   userProfile,
   tokenUsage,
-  isAuthenticated
+  isAuthenticated,
+  onProfileUpdate
 }: TokenStatsDialogProps) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(userProfile.full_name || '');
@@ -112,6 +114,10 @@ const TokenStatsDialog = ({
       if (updatedProfile) {
         setEditedName(updatedProfile.full_name || '');
         setIsEditingName(false);
+        // Call the onProfileUpdate callback with the updated profile
+        if (onProfileUpdate) {
+          onProfileUpdate(updatedProfile);
+        }
         toast('Name updated successfully', {
           style: {
             background: '#4CAF50',
@@ -122,7 +128,7 @@ const TokenStatsDialog = ({
       }
     } catch (error) {
       console.error('Error updating name:', error);
-      toast('Failed to update name', {
+      toast('Oops! You need to sign in first...', {
         style: {
           background: '#f44336',
           color: '#fff',

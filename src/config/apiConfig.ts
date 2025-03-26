@@ -26,7 +26,7 @@ export const DEFAULT_SUBMODELS = {
   openai: 'gpt-4o',
   claude: 'claude-3-7-sonnet',
   gemini: 'gemini-2.0-flash',
-  deepseek: 'Deepseek-V3',
+  deepseek: 'deepseek-chat',
   grok: 'grok-2-1212'
 };
 

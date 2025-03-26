@@ -38,9 +38,8 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
       { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Flash' }
     ],
     deepseek: [
-      { value: 'Deepseek-V3', label: 'Deepseek V3' },
-      { value: 'Deepseek-R1', label: 'Deepseek R1' },
-      { value: 'Deepseek-R1-Zero', label: 'Deepseek R1 Zero' }
+      { value: 'deepseek-chat', label: 'Deepseek Chat' },
+      { value: 'deepseek-reasoner', label: 'Deepseek Reasoner' },
     ],
     grok: [
       { value: 'grok-2-1212', label: 'Grok 2' },
@@ -55,7 +54,6 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
     <Select
       value={selectedSubModel}
       onValueChange={onSubModelChange}
-      
     >
       <SelectTrigger className="w-[100px] md:w-fit bg-amp-blue border-amp-cyan text-amp-cyan text-xs h-[35px]">
         <SelectValue placeholder="Select Model" />
