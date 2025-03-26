@@ -43,9 +43,9 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
       { value: 'Deepseek-R1-Zero', label: 'Deepseek R1 Zero' }
     ],
     grok: [
-      { value: 'grok-2', label: 'Grok 2' },
-      { value: 'grok-1.5', label: 'Grok 1.5' },
-      { value: 'grok-1', label: 'Grok 1' }
+      { value: 'grok-2-1212', label: 'Grok 2' },
+      { value: 'grok-2-vision-1212', label: 'Grok 1.5' },
+      { value: 'grok-beta', label: 'Grok 1' }
     ]
   };
 
