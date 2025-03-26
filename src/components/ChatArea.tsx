@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import { Clipboard } from 'lucide-react';
@@ -40,12 +39,19 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex justify-center items-center h-[80vh] pt-16">
+    <div className="flex justify-center items-center h-[80vh] pt-6">
       <div className="max-h-[calc(100vh-8rem)] self-start max-w-4xl overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-8rem)] pr-[25px] pt-12">
+        <ScrollArea className="h-[calc(100vh-8rem)] pr-[25px] pt-12 [&_[data-radix-scroll-area-scrollbar]]:w-1.5 [&_[data-radix-scroll-area-scrollbar]]:bg-amp-cyan/10 [&_[data-radix-scroll-area-scrollbar]]:hover:bg-amp-cyan/20">
           <div className="px-4 py-4">
+            <div className="flex flex-col items-center justify-center mb-8">
+              <img 
+                src="/images/rovyk-loading.png" 
+                alt="RovyK Loading" 
+                className="lg:w-80 hidden lg:block h-auto mb-4"
+              />
+            </div>
             {messages.map((message) => (
-              <div key={message.id} className="relative group">
+              <div key={message.id} className="relative group p-2">
                 <MessageBubble
                   message={message.text}
                   isAi={message.isAi}

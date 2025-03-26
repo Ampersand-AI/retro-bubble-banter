@@ -20,7 +20,7 @@ const ModelSelect = ({ selectedModel, onModelChange, apiStatus }: ModelSelectPro
       value={selectedModel}
       onValueChange={(value: AIModel) => onModelChange(value)}
     >
-      <SelectTrigger className="w-[140px] bg-amp-blue border-amp-gray text-amp-cyan font-pixel text-xs">
+      <SelectTrigger className="w-[120px] bg-amp-blue border-amp-gray text-amp-cyan font-pixel text-xs">
         <SelectValue>
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${apiStatus[selectedModel] ? 'bg-green-500' : 'bg-red-500'}`}></div>

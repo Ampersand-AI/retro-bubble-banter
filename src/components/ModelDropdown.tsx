@@ -55,8 +55,9 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
     <Select
       value={selectedSubModel}
       onValueChange={onSubModelChange}
+      
     >
-      <SelectTrigger className="w-[140px] bg-amp-blue border-amp-cyan text-amp-cyan text-xs h-[35px]">
+      <SelectTrigger className="w-[100px] md:w-[120px] bg-amp-blue border-amp-cyan text-amp-cyan text-xs h-[35px]">
         <SelectValue placeholder="Select Model" />
       </SelectTrigger>
       <SelectContent className="bg-amp-blue border-amp-cyan text-amp-cyan">
@@ -64,7 +65,7 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
           <SelectItem 
             key={option.value} 
             value={option.value} 
-            className="text-xs hover:bg-amp-gray/20"
+            className="text-xs hover:bg-amp-gray/20 truncate"
           >
             {option.label}
           </SelectItem>

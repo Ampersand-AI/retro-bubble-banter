@@ -105,11 +105,11 @@ const MessageBubble = ({ message, isAi, isTyping, tokenCount }: MessageBubblePro
   return (
     <div className={`flex items-start mb-4 animate-fade-in-up ${isAi ? 'justify-start' : 'justify-end'}`}>
       {isAi && (
-        <div className="w-8 h-8 mr-1 bg-amp-blue flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 bg-amp-blue flex items-center justify-center flex-shrink-0">
           <img 
             src="/images/rovyk.png" 
             alt="AI Assistant" 
-            className="w-6 h-6 filter brightness-100 saturate-100 hue-rotate-60" 
+            className="w-6 h-6" 
           />
         </div>
       )}

@@ -13,6 +13,35 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Validation schemas
+const signInSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+const signUpSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(16, "Password must be at most 16 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+type SignInForm = z.infer<typeof signInSchema>;
+type SignUpForm = z.infer<typeof signUpSchema>;
 
 interface AuthDialogProps {
   open: boolean;
@@ -27,27 +56,46 @@ interface AuthDialogProps {
 
 const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Sign In Form
+  const signInForm = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema),
+    mode: "onBlur",
+  });
+
+  // Sign Up Form
+  const signUpForm = useForm<SignUpForm>({
+    resolver: zodResolver(signUpSchema),
+    mode: "onBlur",
+  });
+
+  const handleSignIn = async (data: SignInForm) => {
     setIsLoading(true);
     
     try {
-      console.log('Attempting sign in for email:', email);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      console.log('Attempting sign in for email:', data.email);
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       });
 
       if (error) {
         console.error('Sign in error:', error);
-        throw error;
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Error",
+            description: "Invalid email or password. Please try again.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+        return;
       }
 
-      if (!data.user) {
+      if (!authData.user) {
         console.error('No user data returned after sign in');
         throw new Error('No user data returned');
       }
@@ -56,7 +104,7 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', data.user.id)
+        .eq('id', authData.user.id)
         .single();
 
       if (profileError) {
@@ -89,24 +137,31 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match!",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleSignUp = async (data: SignUpForm) => {
     setIsLoading(true);
     
     try {
-      console.log('Attempting sign up for email:', email);
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      // First check if user exists in auth
+      const { data: { user: existingUser }, error: checkError } = await supabase.auth.getUser();
+
+      if (existingUser) {
+        toast({
+          title: "Error",
+          description: "User already registered. Please sign in.",
+          variant: "destructive",
+        });
+        // Switch to sign in tab
+        const signInTab = document.querySelector('[value="signin"]');
+        if (signInTab) {
+          (signInTab as HTMLElement).click();
+        }
+        return;
+      }
+
+      console.log('Attempting sign up for email:', data.email);
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`
         }
@@ -114,16 +169,30 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
 
       if (error) {
         console.error('Sign up error:', error);
-        throw error;
+        if (error.message.includes('User already registered')) {
+          toast({
+            title: "Error",
+            description: "User already registered. Please sign in.",
+            variant: "destructive",
+          });
+          // Switch to sign in tab
+          const signInTab = document.querySelector('[value="signin"]');
+          if (signInTab) {
+            (signInTab as HTMLElement).click();
+          }
+        } else {
+          throw error;
+        }
+        return;
       }
 
-      if (!data.user) {
+      if (!authData.user) {
         console.error('No user data returned after sign up');
         throw new Error('No user data returned');
       }
 
       // Check if email confirmation is required
-      if (data.session === null) {
+      if (authData.session === null) {
         console.log('Email confirmation required');
         toast({
           title: "Check your email",
@@ -146,7 +215,7 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select()
-            .eq('id', data.user.id)
+            .eq('id', authData.user.id)
             .maybeSingle();
 
           if (profileError) {
@@ -213,7 +282,6 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
             Sign in or create an account to continue
           </DialogDescription>
         </DialogHeader>
-
         <Tabs defaultValue="signin" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-amp-blue border border-amp-cyan">
             <TabsTrigger value="signin" className="text-amp-cyan data-[state=active]:bg-amp-cyan data-[state=active]:text-amp-blue">
@@ -223,79 +291,134 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
               Sign Up
             </TabsTrigger>
           </TabsList>
-
           <TabsContent value="signin">
-            <form onSubmit={handleSignIn} className="space-y-4">
+            <form onSubmit={signInForm.handleSubmit(handleSignIn)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-amp-cyan">Email</Label>
+                <Label htmlFor="signin-email" className="text-amp-cyan">Email</Label>
                 <Input
-                  id="email"
+                  id="signin-email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-amp-blue border-amp-cyan text-amp-cyan"
-                  required
+                  {...signInForm.register("email")}
+                  className={cn(
+                    "bg-amp-blue border-amp-cyan text-amp-cyan",
+                    signInForm.formState.errors.email && "border-red-500"
+                  )}
                 />
+                {signInForm.formState.errors.email && (
+                  <p className="text-sm text-red-500">
+                    {signInForm.formState.errors.email.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-amp-cyan">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-amp-blue border-amp-cyan text-amp-cyan"
-                  required
-                />
+                <Label htmlFor="signin-password" className="text-amp-cyan">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="signin-password"
+                    type={showPassword ? "text" : "password"}
+                    {...signInForm.register("password")}
+                    className={cn(
+                      "bg-amp-blue border-amp-cyan text-amp-cyan",
+                      signInForm.formState.errors.password && "border-red-500"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {signInForm.formState.errors.password && (
+                  <p className="text-sm text-red-500">
+                    {signInForm.formState.errors.password.message}
+                  </p>
+                )}
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90"
+              <Button 
+                type="submit" 
+                className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90" 
                 disabled={isLoading}
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
           </TabsContent>
-
           <TabsContent value="signup">
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="signup-email" className="text-amp-cyan">Email</Label>
                 <Input
                   id="signup-email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-amp-blue border-amp-cyan text-amp-cyan"
-                  required
+                  {...signUpForm.register("email")}
+                  className={cn(
+                    "bg-amp-blue border-amp-cyan text-amp-cyan",
+                    signUpForm.formState.errors.email && "border-red-500"
+                  )}
                 />
+                {signUpForm.formState.errors.email && (
+                  <p className="text-sm text-red-500">
+                    {signUpForm.formState.errors.email.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-password" className="text-amp-cyan">Password</Label>
-                <Input
-                  id="signup-password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-amp-blue border-amp-cyan text-amp-cyan"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="signup-password"
+                    type={showPassword ? "text" : "password"}
+                    {...signUpForm.register("password")}
+                    className={cn(
+                      "bg-amp-blue border-amp-cyan text-amp-cyan",
+                      signUpForm.formState.errors.password && "border-red-500"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {signUpForm.formState.errors.password && (
+                  <p className="text-sm text-red-500">
+                    {signUpForm.formState.errors.password.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password" className="text-amp-cyan">Confirm Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="bg-amp-blue border-amp-cyan text-amp-cyan"
-                  required
-                />
+                <Label htmlFor="signup-confirm-password" className="text-amp-cyan">Confirm Password</Label>
+                <div className="relative">
+                  <Input
+                    id="signup-confirm-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    {...signUpForm.register("confirmPassword")}
+                    className={cn(
+                      "bg-amp-blue border-amp-cyan text-amp-cyan",
+                      signUpForm.formState.errors.confirmPassword && "border-red-500"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {signUpForm.formState.errors.confirmPassword && (
+                  <p className="text-sm text-red-500">
+                    {signUpForm.formState.errors.confirmPassword.message}
+                  </p>
+                )}
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90"
+              <Button 
+                type="submit" 
+                className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90" 
                 disabled={isLoading}
               >
                 {isLoading ? "Creating account..." : "Sign Up"}

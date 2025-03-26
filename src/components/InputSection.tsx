@@ -130,7 +130,7 @@ const InputSection = ({
 
   return (
     <>
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center">
+      <div className="fixed bottom-8 left-0 right-0 flex justify-center px-2">
         <div className="w-[850px] max-w-[850px] flex items-center">
           <div className="flex items-center space-x-3 mr-3">
             <Mic 

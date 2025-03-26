@@ -48,17 +48,17 @@ const Header = ({
           />
           <button
             onClick={onSubscribeClick}
-            className="hidden md:flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 transition-colors bg-amp-dark-blue px-3 py-1.5 rounded-md border border-yellow-400/30"
+            className="py-[10px] flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 transition-colors bg-amp-dark-blue px-3 rounded-md border border-yellow-400"
           >
             <Crown className="w-4 h-4" />
-            <span className="text-sm font-pixel">Upgrade Now</span>
+            <span className="text-sm font-pixel hidden md:flex">Upgrade</span>
           </button>
           <button
             onClick={onTokenStatsClick}
             className="flex items-center space-x-2 text-amp-cyan hover:text-amp-gray transition-colors"
           >
             <UserCog className="w-5 h-5" />
-            <span className="text-sm">{isAuthenticated ? 'Account' : 'Sign in'}</span>
+            <span className="text-sm hidden md:block">{isAuthenticated ? 'Account' : 'Sign in'}</span>
           </button>
         </div>
       </div>
