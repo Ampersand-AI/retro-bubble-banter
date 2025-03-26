@@ -69,6 +69,7 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
           <DialogDescription className="text-center text-amp-gray">
             Select a plan that best fits your needs
           </DialogDescription>
+          
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
@@ -149,6 +150,9 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
             </Button>
           </div>
         </div>
+        <div className="text-xs text-amp-gray- text-center mt-2">
+            Note: Grok and Claude models are coming soon to premium plans
+          </div>
       </DialogContent>
     </Dialog>
   );

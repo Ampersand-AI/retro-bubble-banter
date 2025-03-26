@@ -35,7 +35,7 @@ const Header = ({
       <div className="flex items-center justify-between h-full px-4 md:px-8">
         <div className="flex items-center space-x-2">
           <img src="/images/rovyk.png" alt="Rovyk" className="w-10 h-10" />
-          <h1 className="font-pixel text-md md:text-xl text-amp-cyan tracking-wider">Rovyk</h1>
+          <h1 className="font-pixel text-md md:text-xl text-amp-cyan tracking-wider">Rovyk<sup className="text-xs ml-1 text-yellow-400">Beta</sup></h1>
         </div>
         <div className="flex items-center space-x-2 md:space-x-4">
           <div className="hidden md:block">

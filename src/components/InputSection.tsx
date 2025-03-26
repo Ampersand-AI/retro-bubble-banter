@@ -3,6 +3,7 @@ import { Send, Mic, Paperclip } from 'lucide-react';
 import ModelDropdown from './ModelDropdown';
 import { AIModel } from '../config/apiConfig';
 import AuthDialog from './AuthDialog';
+import { useTypewriter } from '../hooks/useTypewriter';
 
 interface InputSectionProps {
   onSendMessage: (message: string) => void;
@@ -31,6 +32,12 @@ const InputSection = ({
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  const placeholderText = isAuthenticated 
+    ? "Type your message..." 
+    : "Sign in to start chatting...";
+  
+  const typewriterText = useTypewriter(placeholderText, 50, 2000);
   
   // Auto-focus on the input field when component mounts
   useEffect(() => {
@@ -149,8 +156,8 @@ const InputSection = ({
                 setIsTyping(e.target.value.length > 0);
               }}
               onKeyDown={handleKeyDown}
-              placeholder={isAuthenticated ? "Type your message..." : "Sign in to start chatting..."}
-              className={`w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray caret-4 ${!isTyping ? 'animate-blink' : ''}`}
+              placeholder={!isTyping ? typewriterText : ""}
+              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray caret-4 [&::placeholder]:animate-none"
             />
           </div>
           

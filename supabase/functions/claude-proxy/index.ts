@@ -67,7 +67,7 @@ serve(async (req) => {
     }
 
     const claudeRequest = {
-      model: 'claude-3-sonnet',
+      model: requestData.model || 'claude-3.7-sonnet',
       max_tokens: 4096,
       temperature: 0.7,
       system: "You are a helpful AI assistant.",

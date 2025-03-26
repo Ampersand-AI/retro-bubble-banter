@@ -28,13 +28,13 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
       { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
     ],
     claude: [
-      { value: 'claude-3-opus', label: 'Claude 3 Opus' },
-      { value: 'claude-3-sonnet', label: 'Claude 3 Sonnet' },
-      { value: 'claude-3-haiku', label: 'Claude 3 Haiku' }
+      { value: 'claude-3-7-sonnet', label: 'Claude 3.7 Sonnet' },
+      { value: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
+      { value: 'claude-3-5-haiku', label: 'Claude 3.5 Haiku' }
     ],
     gemini: [
-      { value: 'gemini-2.0-pro', label: 'Gemini 2.0 Flash' },
-      { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash Lite' },
+      { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
+      { value: 'gemini-2.0-flash-lite', label: 'Gemini 2.0 Flash Lite' },
       { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Flash' }
     ],
     deepseek: [
@@ -57,7 +57,7 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
       onValueChange={onSubModelChange}
       
     >
-      <SelectTrigger className="w-[100px] md:w-[120px] bg-amp-blue border-amp-cyan text-amp-cyan text-xs h-[35px]">
+      <SelectTrigger className="w-[100px] md:w-fit bg-amp-blue border-amp-cyan text-amp-cyan text-xs h-[35px]">
         <SelectValue placeholder="Select Model" />
       </SelectTrigger>
       <SelectContent className="bg-amp-blue border-amp-cyan text-amp-cyan">

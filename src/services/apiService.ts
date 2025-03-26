@@ -1,5 +1,10 @@
-import { API_KEYS } from '../config/apiConfig';
+import { API_KEYS, Message } from '../config/apiConfig';
 import { estimateTokens, simulateResponse } from '../utils/tokenUtils';
+
+type ClaudeMessage = {
+  role: string;
+  content: string;
+};
 
 // OpenAI API fetch function
 export const fetchOpenAIResponse = async (userMessage: string, subModel: string) => {
@@ -60,13 +65,13 @@ export const fetchOpenAIResponse = async (userMessage: string, subModel: string)
 };
 
 // Claude API fetch function
-export const fetchClaudeResponse = async (userMessage: string | Message[], subModel: string) => {
+export const fetchClaudeResponse = async (userMessage: string | ClaudeMessage[], subModel: string) => {
   try {
     // Format messages for Claude API
     const formattedMessages = Array.isArray(userMessage)
       ? userMessage.map(msg => ({
           role: msg.role || 'user',
-          content: msg.content || msg.text || ''
+          content: msg.content || ''
         }))
       : [{ role: 'user', content: userMessage }]
 
@@ -78,7 +83,8 @@ export const fetchClaudeResponse = async (userMessage: string | Message[], subMo
         'x-test-request': 'true'
       },
       body: JSON.stringify({
-        messages: formattedMessages
+        messages: formattedMessages,
+        model: subModel || 'claude-3.7-sonnet'
       })
     });
 
