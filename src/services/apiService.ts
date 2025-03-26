@@ -60,61 +60,58 @@ export const fetchOpenAIResponse = async (userMessage: string, subModel: string)
 };
 
 // Claude API fetch function
-export const fetchClaudeResponse = async (userMessage: string, subModel: string) => {
+export const fetchClaudeResponse = async (userMessage: string | Message[], subModel: string) => {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-    
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    // Format messages for Claude API
+    const formattedMessages = Array.isArray(userMessage)
+      ? userMessage.map(msg => ({
+          role: msg.role || 'user',
+          content: msg.content || msg.text || ''
+        }))
+      : [{ role: 'user', content: userMessage }]
+
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': API_KEYS.claude,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY}`,
+        'x-test-request': 'true'
       },
       body: JSON.stringify({
-        model: subModel || 'claude-3-haiku-20240307',
-        messages: [
-          { role: 'user', content: userMessage }
-        ],
-        max_tokens: 1000
-      }),
-      signal: controller.signal
+        messages: formattedMessages
+      })
     });
-    
-    clearTimeout(timeoutId);
-    
+
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Claude API error:", errorData);
+      console.error('Claude API error details:', errorData);
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Handle both old and new response formats
+    if (typeof userMessage === 'string') {
       return {
-        text: `Error: ${errorData.error?.message || "Unknown error with Claude API"}`,
+        text: data.content[0].text,
         tokenCount: {
-          input: estimateTokens(userMessage),
-          output: 0
+          input: data.usage?.input_tokens || 0,
+          output: data.usage?.output_tokens || 0
         }
       };
+    } else {
+      return {
+        role: data.role || 'assistant',
+        content: data.content[0].text,
+        timestamp: new Date().toISOString(),
+        model: data.model,
+        stop_reason: data.stop_reason,
+        stop_sequence: data.stop_sequence
+      };
     }
-    
-    const data = await response.json();
-    const aiResponse = data.content?.[0]?.text || simulateResponse(userMessage).text;
-    
-    return {
-      text: aiResponse,
-      tokenCount: {
-        input: data.usage?.prompt_tokens || estimateTokens(userMessage),
-        output: data.usage?.completion_tokens || estimateTokens(aiResponse)
-      }
-    };
   } catch (error) {
-    console.error("Claude API error:", error);
-    return {
-      text: `Error communicating with Claude. Please try again.`,
-      tokenCount: {
-        input: estimateTokens(userMessage),
-        output: 0
-      }
-    };
+    console.error('Claude API error:', error);
+    throw error;
   }
 };
 

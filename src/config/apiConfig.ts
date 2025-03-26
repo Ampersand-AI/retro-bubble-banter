@@ -24,9 +24,9 @@ if (missingKeys.length > 0) {
 // Default submodels for each AI provider
 export const DEFAULT_SUBMODELS = {
   openai: 'gpt-4o',
-  claude: 'claude-3-opus',
+  claude: 'claude-3-sonnet',
   gemini: 'gemini-2.0-flash',
-  deepseek: 'deepseek-chat',
+  deepseek: 'Deepseek-V3',
   grok: 'grok-1'
 };
 

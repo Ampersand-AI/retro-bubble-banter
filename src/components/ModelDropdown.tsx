@@ -38,14 +38,14 @@ const ModelDropdown = ({ selectedModel, selectedSubModel, onSubModelChange }: Mo
       { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Flash' }
     ],
     deepseek: [
-      { value: 'deepseek-chat', label: 'DeepSeek Chat' },
-      { value: 'deepseek-coder', label: 'DeepSeek Coder' },
-      { value: 'deepseek-math', label: 'DeepSeek Math' }
+      { value: 'Deepseek-V3', label: 'Deepseek V3' },
+      { value: 'Deepseek-R1', label: 'Deepseek R1' },
+      { value: 'Deepseek-R1-Zero', label: 'Deepseek R1 Zero' }
     ],
     grok: [
-      { value: 'grok-1', label: 'Grok 1' },
+      { value: 'grok-2', label: 'Grok 2' },
       { value: 'grok-1.5', label: 'Grok 1.5' },
-      { value: 'grok-2', label: 'Grok 2' }
+      { value: 'grok-1', label: 'Grok 1' }
     ]
   };
 

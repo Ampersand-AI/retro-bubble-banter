@@ -25,30 +25,33 @@ export const testOpenAIApi = async (): Promise<boolean> => {
 // Test Claude API availability
 export const testClaudeApi = async (): Promise<boolean> => {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-    
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': API_KEYS.claude,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY}`,
+        'x-test-request': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 10,
         messages: [
-          { role: 'user', content: 'Hi' }
+          {
+            role: 'user',
+            content: 'Hello, this is a test message.'
+          }
         ]
-      }),
-      signal: controller.signal
+      })
     });
-    
-    clearTimeout(timeoutId);
-    return response.status === 200;
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Claude API test error details:', errorData);
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return true;
   } catch (error) {
-    console.error("Claude API test error:", error);
+    console.error('Claude API test error:', error);
     return false;
   }
 };
