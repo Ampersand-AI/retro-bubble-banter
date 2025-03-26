@@ -61,7 +61,7 @@
 
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 3px;
+    width: 2px;
   }
 
   ::-webkit-scrollbar-track {
@@ -83,7 +83,7 @@
   }
   
   input.caret-4 {
-    caret-width: 4px;
+    width: 10px;
   }
   
   @keyframes blink {
@@ -94,6 +94,16 @@
   /* Green progress bars */
   .green-progress .green-progress-indicator {
     @apply bg-green-500;
+  }
+
+  /* Custom placeholder cursor */
+  textarea::placeholder {
+    color: var(--amp-dark-gray);
+  }
+
+  textarea::placeholder:last-child {
+    color: var(--amp-cyan);
+    font-weight: 700;
   }
 }
 

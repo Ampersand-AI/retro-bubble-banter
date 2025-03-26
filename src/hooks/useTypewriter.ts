@@ -58,5 +58,5 @@ export const useTypewriter = (text: string, speed: number = 100, delay: number =
     };
   }, [text, speed, delay, isTyping]);
 
-  return displayText + (showCursor ? '|' : '');
-}; 
+  return { text: displayText, showCursor };
+};

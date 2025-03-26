@@ -37,7 +37,7 @@ const InputSection = ({
     ? "Type your message..." 
     : "Sign in to start chatting...";
   
-  const typewriterText = useTypewriter(placeholderText, 50, 2000);
+  const { text: typewriterText, showCursor } = useTypewriter(placeholderText, 50, 2000);
   
   // Auto-focus on the textarea when component mounts
   useEffect(() => {
@@ -66,6 +66,7 @@ const InputSection = ({
     if (message.trim()) {
       onSendMessage(message);
       setMessage('');
+      setIsTyping(false); // Reset isTyping to show placeholder
       // Reset textarea height after sending
       if (textareaRef.current) {
         textareaRef.current.style.height = '40px';
@@ -154,7 +155,7 @@ const InputSection = ({
     <>
       <div className="fixed bottom-8 left-0 right-0 flex justify-center px-2 input-section">
         <div className="w-[850px] max-w-[850px] flex items-end">
-          <div className="flex items-center space-x-3 mr-3 mb-1">
+          <div className="flex items-center space-x-3 mr-3 mb-2">
             <Mic 
               className={`w-6 h-6 ${isRecording ? 'text-blue-500' : 'text-blue-400'} hover:text-blue-600 cursor-pointer transition-colors`}
               onClick={handleVoiceToText}
@@ -166,7 +167,7 @@ const InputSection = ({
             />  
           </div>
           
-          <div className="flex-1 bg-black/30 rounded-lg">
+          <div className="flex-1 rounded-lg">
             <textarea
               ref={textareaRef}
               value={message}
@@ -175,16 +176,16 @@ const InputSection = ({
                 setIsTyping(e.target.value.length > 0);
               }}
               onKeyDown={handleKeyDown}
-              placeholder={!isTyping ? typewriterText : ""}
-              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray placeholder:text-bold caret-4 [&::placeholder]:animate-none resize-none overflow-hidden min-h-[40px] max-h-[100px]"
+              placeholder={!isTyping ? `${typewriterText}${showCursor ? '▋' : ''}` : ""}
+              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray placeholder:text-lg placeholder:tracking-[0.2em] placeholder:font-normal caret-4 [&::placeholder]:animate-none resize-none overflow-hidden min-h-[40px] max-h-[120px]"
               rows={1}
             />
           </div>
           
-          <div className="flex items-center gap-3 mb-1">
+          <div className="flex items-center gap-3 mb-2">
             <button 
               onClick={handleSend}
-              className="ml-1 py-3 px-3 h-11 w-11 flex items-center justify-center bg-transparent"
+              className="ml-1 py-2 px-3 h-[40px] w-[40px] flex items-center justify-center bg-transparent"
               disabled={!message.trim()}
             >
               <Send className="w-6 h-6 text-amp-cyan" />
