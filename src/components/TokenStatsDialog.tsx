@@ -132,6 +132,9 @@ const TokenStatsDialog = ({
     }
   };
 
+  const isPremiumUser = userProfile.is_subscribed && 
+    (userProfile.subscription_tier === 'plus' || userProfile.subscription_tier === 'ultra');
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -234,13 +237,15 @@ const TokenStatsDialog = ({
           )}
 
           <DialogFooter className="flex justify-between mt-6">
-            <Button
-              onClick={() => setShowSupportDialog(true)}
-              className="bg-amp-dark-blue text-amp-cyan hover:bg-amp-gray/20"
-            >
-              <HelpCircle className="w-4 h-4 mr-2" />
-              Support
-            </Button>
+            {isAuthenticated && isPremiumUser && (
+              <Button
+                onClick={() => setShowSupportDialog(true)}
+                className="bg-amp-dark-blue text-amp-cyan hover:bg-amp-gray/20"
+              >
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Support
+              </Button>
+            )}
             {isAuthenticated ? (
               <Button
                 onClick={handleLogout}

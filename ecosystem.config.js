@@ -1,16 +1,7 @@
 export default {
   apps: [
     {
-      name: 'rovyk-frontend',
-      script: 'npm',
-      args: 'run preview',
-      env: {
-        NODE_ENV: 'production',
-        PORT: 3000
-      }
-    },
-    {
-      name: 'rovyk-backend',
+      name: 'rovyk-app',
       script: 'server.js',
       env: {
         NODE_ENV: 'production',

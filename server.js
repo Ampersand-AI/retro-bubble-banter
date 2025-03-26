@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,6 +19,7 @@ app.use(express.json());
 
 const resend = new Resend(process.env.VITE_RESEND_API_KEY);
 
+// API Routes
 app.post('/api/support', async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -54,6 +56,14 @@ app.post('/api/support', async (req, res) => {
   }
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${port}`);
+// Serve frontend build files
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Handle all other routes by serving index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });

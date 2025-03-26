@@ -1,6 +1,4 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
+import { API_ENDPOINTS } from '@/config';
 
 export async function sendSupportEmail(data: { name: string; email: string; message: string }) {
   try {
@@ -18,7 +16,7 @@ export async function sendSupportEmail(data: { name: string; email: string; mess
     }
 
     // Send request to our server
-    const response = await fetch('http://localhost:3001/api/support', {
+    const response = await fetch(API_ENDPOINTS.support, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
