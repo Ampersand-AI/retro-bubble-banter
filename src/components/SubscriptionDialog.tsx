@@ -80,7 +80,7 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
             <ul className="space-y-3 mb-6 flex-grow">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
-                <span className="text-sm">200,000 tokens per month</span>
+                <span className="text-sm">200,000 tokens</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
@@ -118,7 +118,7 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
             <ul className="space-y-3 mb-6 flex-grow">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
-                <span className="text-sm">500,000 tokens per month</span>
+                <span className="text-sm">500,000 tokens</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
@@ -149,8 +149,8 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
             </Button>
           </div>
         </div>
-        <div className="text-xs text-amp-gray- text-center mt-2">
-          Note: Grok and Claude models are coming soon to premium plans
+        <div className="text-sm text-amp-gray- text-center mt-1">
+          Note: Claude will be coming soon to premium plans
         </div>
       </DialogContent>
     </Dialog>

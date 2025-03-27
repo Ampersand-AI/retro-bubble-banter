@@ -2,6 +2,7 @@ import { UserCog, Crown } from 'lucide-react';
 import { AIModel } from '../config/apiConfig';
 import SystemArtifact from './SystemArtifact';
 import ModelSelect from './ModelSelect';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   selectedModel: AIModel;
@@ -30,10 +31,15 @@ const Header = ({
   onSubscribeClick,
   isAuthenticated 
 }: HeaderProps) => {
+  const navigate = useNavigate();
+
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-amp-blue z-50 animate-fade-in-down">
       <div className="flex items-center justify-between h-full px-4 md:px-8">
-        <div className="flex items-center space-x-2">
+        <div 
+          className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => navigate('/')}
+        >
           <img src="/images/rovyk.png" alt="Rovyk" className="w-8 h-8 md:w-10 md:h-10" />
           <h1 className="font-pixel text-sm md:text-xl text-amp-cyan tracking-wider">Rovyk<sup className="text-[10px] ml-1 text-yellow-400">Beta</sup></h1>
         </div>
