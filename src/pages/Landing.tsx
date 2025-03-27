@@ -332,9 +332,9 @@ const Landing = () => {
           </div>
           <div className="relative">
             <img 
-              src="/images/rovyk-loading.png" 
+              src="/images/rovyk-comic.jpg" 
               alt="Rovyk AI" 
-              className="w-full max-w-md mx-auto animate-pulse"
+              className="w-full max-w-md mx-auto"
             />
           </div>
         </div>
