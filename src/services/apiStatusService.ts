@@ -98,17 +98,11 @@ export const testDeepSeekApi = async (): Promise<boolean> => {
 
 export const testGrokApi = async (): Promise<boolean> => {
   try {
-    const response = await fetch('https://api.grok.ai/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch('https://api.x.ai/v1/models', {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${API_KEYS.grok}`
-      },
-      body: JSON.stringify({
-        model: 'grok-1',
-        messages: [{ role: 'user', content: 'test' }],
-        max_tokens: 1
-      })
+      }
     });
     return response.ok;
   } catch (error) {

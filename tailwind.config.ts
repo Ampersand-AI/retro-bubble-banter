@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -100,6 +99,16 @@ export default {
 					'50%': { transform: 'translateY(-5px)' },
 					'100%': { transform: 'translateY(0)' }
 				},
+				'glitch-1': {
+					'0%, 100%': { transform: 'none' },
+					'50%': { transform: 'skew(-2deg)' },
+					'25%, 75%': { transform: 'skew(2deg)' }
+				},
+				'glitch-2': {
+					'0%, 100%': { transform: 'none' },
+					'50%': { transform: 'skew(2deg)' },
+					'25%, 75%': { transform: 'skew(-2deg)' }
+				},
 				pixelate: {
 					'0%': { filter: 'brightness(1.5) contrast(1.5) pixelate(2px)' },
 					'50%': { filter: 'brightness(1) contrast(1) pixelate(1px)' },
@@ -120,6 +129,8 @@ export default {
 				scanline: 'scanline 8s linear infinite',
 				blink: 'blink 1s ease-in-out infinite',
 				typing: 'typing 0.6s ease-in-out infinite',
+				'glitch-1': 'glitch-1 4s infinite linear alternate-reverse',
+				'glitch-2': 'glitch-2 5s infinite linear alternate-reverse',
 				pixelate: 'pixelate 3s ease-in-out infinite',
 				'fade-in-up': 'fade-in-up 0.3s ease-out',
 				'fade-in-down': 'fade-in-down 0.3s ease-out',

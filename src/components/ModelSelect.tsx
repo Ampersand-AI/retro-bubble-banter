@@ -30,7 +30,13 @@ const ModelSelect = ({ selectedModel, onModelChange, apiStatus }: ModelSelectPro
           </div>
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="bg-amp-blue border-amp-gray text-amp-cyan font-pixel">
+      <SelectContent className="bg-amp-blue border-amp-cyan text-amp-cyan">
+        <SelectItem value="gemini" className="text-xs hover:bg-amp-gray/20">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${apiStatus.gemini ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span>Gemini</span>
+          </div>
+        </SelectItem>
         <SelectItem value="openai" className="text-xs hover:bg-amp-gray/20">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${apiStatus.openai ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -41,12 +47,6 @@ const ModelSelect = ({ selectedModel, onModelChange, apiStatus }: ModelSelectPro
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${apiStatus.claude ? 'bg-green-500' : 'bg-red-500'}`}></div>
             <span>Claude</span>
-          </div>
-        </SelectItem>
-        <SelectItem value="gemini" className="text-xs hover:bg-amp-gray/20">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${apiStatus.gemini ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span>Gemini</span>
           </div>
         </SelectItem>
         <SelectItem value="deepseek" className="text-xs hover:bg-amp-gray/20">
