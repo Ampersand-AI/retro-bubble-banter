@@ -119,8 +119,8 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     setIsLoading(true);
     
     try {
-      // Get the current origin (works for both localhost and production)
-      const redirectUrl = `${window.location.origin}/auth/callback?next=/reset-password`;
+      // Get the current origin and redirect to chat page
+      const redirectUrl = `${window.location.origin}/chat?next=/reset-password`;
       
       const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
         redirectTo: redirectUrl,
