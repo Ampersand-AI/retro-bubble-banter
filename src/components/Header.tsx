@@ -1,4 +1,4 @@
-import { UserCog, Crown } from 'lucide-react';
+import { UserCog, Crown, Sparkles } from 'lucide-react';
 import { AIModel } from '../config/apiConfig';
 import SystemArtifact from './SystemArtifact';
 import ModelSelect from './ModelSelect';
@@ -20,6 +20,8 @@ interface HeaderProps {
   onTokenStatsClick: () => void;
   onSubscribeClick: () => void;
   isAuthenticated: boolean;
+  isPromptMode: boolean;
+  onModeToggle: () => void;
 }
 
 const Header = ({ 
@@ -29,7 +31,9 @@ const Header = ({
   messages, 
   onTokenStatsClick,
   onSubscribeClick,
-  isAuthenticated 
+  isAuthenticated,
+  isPromptMode,
+  onModeToggle
 }: HeaderProps) => {
   const navigate = useNavigate();
 
@@ -52,6 +56,19 @@ const Header = ({
             onModelChange={onModelChange}
             apiStatus={apiStatus}
           />
+          <button
+            onClick={onModeToggle}
+            className={`py-[10px] flex items-center space-x-2 transition-colors bg-amp-dark-blue px-3 rounded-md border ${
+              isPromptMode 
+                ? 'border-amp-cyan text-amp-cyan hover:bg-amp-cyan/10' 
+                : 'border-yellow-400 text-yellow-400 hover:bg-yellow-400/10'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span className="text-sm font-pixel hidden md:flex">
+              {isPromptMode ? 'Chat Mode' : 'Prompt Mode'}
+            </span>
+          </button>
           <button
             onClick={onSubscribeClick}
             className="py-[10px] flex items-center space-x-2 text-yellow-400 hover:text-yellow-300 transition-colors bg-amp-dark-blue px-3 rounded-md border border-yellow-400"

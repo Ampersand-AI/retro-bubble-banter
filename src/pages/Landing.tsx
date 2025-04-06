@@ -105,6 +105,69 @@ const Landing = () => {
           </div>
         </div>
 
+        {/* New Feature Announcement */}
+        <div className="max-w-4xl mx-auto mb-16">
+          <div className="bg-amp-blue/30 p-6 rounded-lg border border-amp-cyan/20 hover:border-amp-cyan/40 transition-all animate-fade-in-up">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-amp-cyan/20 p-3 rounded-lg">
+                <Sparkles className="w-6 h-6 text-amp-cyan" />
+              </div>
+              <div>
+                <h3 className="text-xl font-pixel text-amp-cyan">New Feature: AI Prompt Generator</h3>
+                <p className="text-amp-gray text-sm">Generate optimized prompts for your favorite AI tools</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-black/20 p-4 rounded-lg">
+                <h4 className="text-amp-cyan font-pixel mb-2">Supported Tools</h4>
+                <ul className="space-y-2 text-amp-gray text-sm">
+                  <li className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-amp-cyan" />
+                    <TypewriterText text="V0 - UI Design" />
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-amp-cyan" />
+                    <TypewriterText text="Cursor - Code Generation" />
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-amp-cyan" />
+                    <TypewriterText text="Bolt - App Development" />
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-amp-cyan" />
+                    <TypewriterText text="Tempo - Component Building" />
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-amp-cyan" />
+                    <TypewriterText text="Lovable - Design System" />
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-black/20 p-4 rounded-lg">
+                <h4 className="text-amp-cyan font-pixel mb-2">Key Benefits</h4>
+                <ul className="space-y-2 text-amp-gray text-sm">
+                  <li className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amp-cyan" />
+                    <span>Optimized prompts for each tool</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amp-cyan" />
+                    <span>Token-efficient generation</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amp-cyan" />
+                    <span>Markdown-formatted output</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-amp-cyan" />
+                    <span>One-click copy functionality</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Features Grid */}
         <div className="max-w-4xl mx-auto">
           <div className="space-y-8 animate-fade-in-up">
