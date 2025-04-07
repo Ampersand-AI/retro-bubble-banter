@@ -152,6 +152,7 @@ export const useMessages = () => {
     setMessageIdCounter,
     addMessage,
     addModelSwitchMessage,
-    handleSendMessage
+    handleSendMessage,
+    setMessages
   };
 };

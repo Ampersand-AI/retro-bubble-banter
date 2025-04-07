@@ -21,6 +21,7 @@ import { supabase, UserProfile } from '../lib/supabase';
 import ToolSelect from '../components/ToolSelect';
 import PromptDisplay from '../components/PromptDisplay';
 import { Button } from '../components/ui/button';
+import { createTerminalCommands, handleTerminalCommand as handleTerminalCommandUtil } from '../utils/terminalCommands';
 
 interface TokenUsage {
   total: number;
@@ -69,7 +70,10 @@ const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const [session, setSession] = useState<any>(null);
-  const [isPromptMode, setIsPromptMode] = useState(false);
+  const [isPromptMode, setIsPromptMode] = useState(() => {
+    const storedMode = localStorage.getItem('chatMode');
+    return storedMode === 'prompt' ? true : false;
+  });
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
@@ -81,7 +85,8 @@ const Index = () => {
     messageIdCounter, 
     setMessageIdCounter, 
     addModelSwitchMessage, 
-    handleSendMessage 
+    handleSendMessage,
+    setMessages
   } = useMessages();
 
   // Update submodel when the main model changes
@@ -373,6 +378,26 @@ const Index = () => {
   const handlePromptGeneration = async (description: string) => {
     if (!selectedTool || !session?.user) return;
 
+    // Create commands object
+    const commands = createTerminalCommands(
+      setIsPromptMode,
+      setSelectedModel,
+      setSelectedSubModel,
+      handleSendMessage,
+      setMessages
+    );
+
+    // Check if the input is a command
+    if (description.startsWith('/')) {
+      const response = handleTerminalCommandUtil(description, commands);
+      if (response.isCommand) {
+        if (response.shouldSendMessage && response.message) {
+          handleSendMessage(response.message, selectedModel, selectedSubModel, messageIdCounter);
+        }
+        return;
+      }
+    }
+
     setIsGeneratingPrompt(true);
     try {
       // Calculate input token usage (user's description)
@@ -526,12 +551,73 @@ Create a detailed prompt for ${tool.name} based on this product idea: ${descript
           }
           return geminiData.candidates[0].content.parts[0].text;
         
+        case 'deepseek':
+          response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: selectedSubModel,
+              messages: [{ role: 'user', content: prompt }],
+              temperature: 0.7
+            })
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'DeepSeek API request failed');
+          }
+          const deepseekData = await response.json();
+          if (!deepseekData.choices?.[0]?.message?.content) {
+            throw new Error('Invalid response from DeepSeek API');
+          }
+          return deepseekData.choices[0].message.content;
+        
+        case 'grok':
+          response = await fetch('https://api.grok.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${import.meta.env.VITE_GROK_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: selectedSubModel,
+              messages: [{ role: 'user', content: prompt }],
+              temperature: 0.7
+            })
+          });
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'Grok API request failed');
+          }
+          const grokData = await response.json();
+          if (!grokData.choices?.[0]?.message?.content) {
+            throw new Error('Invalid response from Grok API');
+          }
+          return grokData.choices[0].message.content;
+        
         default:
           throw new Error('Unsupported model');
       }
     } catch (error) {
       console.error('Error generating prompt:', error);
       throw new Error(error instanceof Error ? error.message : 'Failed to generate prompt');
+    }
+  };
+
+  const handleTerminalCommand = (command: string) => {
+    const commands = createTerminalCommands(
+      setIsPromptMode,
+      setSelectedModel,
+      setSelectedSubModel,
+      handleSendMessage,
+      setMessages
+    );
+    
+    const response = handleTerminalCommandUtil(command, commands);
+    if (response.isCommand && response.shouldSendMessage && response.message) {
+      handleSendMessage(response.message, selectedModel, selectedSubModel, messageIdCounter);
     }
   };
 
@@ -604,6 +690,7 @@ Create a detailed prompt for ${tool.name} based on this product idea: ${descript
               onSubModelChange={handleSubModelChange}
               isAuthenticated={isAuthenticated}
               onAuthSuccess={handleInputAuthSuccess}
+              onTerminalCommand={handleTerminalCommand}
             />
           </>
         )}

@@ -4,6 +4,7 @@ import ModelDropdown from './ModelDropdown';
 import { AIModel } from '../config/apiConfig';
 import AuthDialog from './AuthDialog';
 import { useTypewriter } from '../hooks/useTypewriter';
+import { handleTerminalCommand } from '../utils/terminalCommands';
 
 interface InputSectionProps {
   onSendMessage: (message: string) => void;
@@ -16,6 +17,7 @@ interface InputSectionProps {
     isSubscribed: boolean;
     subscriptionTier?: 'free' | 'pro' | 'enterprise';
   }) => void;
+  onTerminalCommand?: (command: string) => void;
 }
 
 const InputSection = ({ 
@@ -24,7 +26,8 @@ const InputSection = ({
   selectedSubModel, 
   onSubModelChange,
   isAuthenticated = false,
-  onAuthSuccess 
+  onAuthSuccess,
+  onTerminalCommand
 }: InputSectionProps) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -34,7 +37,7 @@ const InputSection = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const placeholderText = isAuthenticated 
-    ? "Type your message..." 
+    ? "Type your message or use /help for commands..." 
     : "Sign in to start chatting...";
   
   const { text: typewriterText, showCursor } = useTypewriter(placeholderText, 50, 2000);
@@ -64,7 +67,11 @@ const InputSection = ({
     }
 
     if (message.trim()) {
-      onSendMessage(message);
+      if (message.startsWith('/') && onTerminalCommand) {
+        onTerminalCommand(message);
+      } else {
+        onSendMessage(message);
+      }
       setMessage('');
       setIsTyping(false); // Reset isTyping to show placeholder
       // Reset textarea height after sending

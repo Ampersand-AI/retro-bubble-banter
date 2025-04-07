@@ -40,6 +40,11 @@ const Landing = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleNavigateToChat = () => {
+    localStorage.setItem('chatMode', 'chat');
+    navigate('/chat');
+  };
+
   return (
     <div className="min-h-screen bg-black text-amp-cyan font-mono relative overflow-hidden">
       <LandingHeader />
@@ -207,7 +212,7 @@ const Landing = () => {
             
             <div className="flex justify-center">
               <button
-                onClick={() => navigate('/chat')}
+                onClick={handleNavigateToChat}
                 className="bg-amp-blue text-amp-cyan px-8 py-4 rounded-lg font-pixel text-lg hover:bg-amp-blue/80 transition-colors border border-amp-cyan/20 hover:border-amp-cyan/40"
               >
                 Open Chat
@@ -292,7 +297,7 @@ const Landing = () => {
               </ul>
             </div>
             <button
-              onClick={() => navigate('/chat')}
+              onClick={handleNavigateToChat}
               className="w-full bg-amp-blue text-amp-cyan px-6 py-3 rounded-lg font-pixel hover:bg-amp-blue/80 transition-colors border border-amp-cyan/20 hover:border-amp-cyan/40"
             >
               Get Started
@@ -320,7 +325,7 @@ const Landing = () => {
               </ul>
             </div>
             <button
-              onClick={() => navigate('/chat')}
+              onClick={handleNavigateToChat}
               className="w-full bg-amp-blue text-amp-cyan px-6 py-3 rounded-lg font-pixel hover:bg-amp-blue/80 transition-colors border border-amp-cyan/20 hover:border-amp-cyan/40"
             >
               Upgrade to Plus
@@ -355,7 +360,7 @@ const Landing = () => {
               </ul>
             </div>
             <button
-              onClick={() => navigate('/chat')}
+              onClick={handleNavigateToChat}
               className="w-full bg-amp-cyan text-black px-6 py-3 rounded-lg font-pixel hover:bg-amp-cyan/90 transition-colors"
             >
               Upgrade to Ultra
@@ -385,7 +390,7 @@ const Landing = () => {
             </p>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/chat')}
+                onClick={handleNavigateToChat}
                 className="text-amp-gray border-amp-cyan border-2 px-4 py-2 rounded-lg font-pixel bg-amp-blue hover:text-amp-cyan transition-colors flex items-center gap-2"
               >
                 <Terminal className="w-4 h-4" />
