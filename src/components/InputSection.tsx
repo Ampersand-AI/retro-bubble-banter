@@ -160,7 +160,7 @@ const InputSection = ({
 
   return (
     <>
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center px-2 input-section">
+      <div className="fixed bottom-8 left-0 right-0 flex justify-center px-2 input-section bg-amp-blue">
         <div className="w-[850px] max-w-[850px] flex items-end">
           <div className="flex items-center space-x-3 mr-3 mb-2">
             <Mic 
@@ -184,7 +184,7 @@ const InputSection = ({
               }}
               onKeyDown={handleKeyDown}
               placeholder={!isTyping ? `${typewriterText}${showCursor ? '▋' : ''}` : ""}
-              className="w-full bg-transparent p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray placeholder:text-lg placeholder:tracking-[0.2em] placeholder:font-normal caret-4 [&::placeholder]:animate-none resize-none overflow-hidden min-h-[40px] max-h-[120px]"
+              className="w-full bg-amp-blue p-2 outline-none font-mono text-green-500 placeholder:text-amp-dark-gray placeholder:text-lg placeholder:font-normal caret-4 [&::placeholder]:animate-none resize-none overflow-hidden min-h-[40px] max-h-[120px]"
               rows={1}
             />
           </div>
