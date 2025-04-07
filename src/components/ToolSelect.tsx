@@ -49,7 +49,7 @@ interface ToolSelectProps {
 
 const ToolSelect = ({ onToolSelect }: ToolSelectProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-1  md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 max-w-[1440px] mx-auto">
       {tools.slice(0, 3).map((tool) => (
         <Card 
           key={tool.id}
