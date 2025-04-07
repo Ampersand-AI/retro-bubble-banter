@@ -105,8 +105,8 @@ const InputSection = ({
       const recognition = new SpeechRecognitionAPI();
       
       recognition.lang = 'en-US';
-      recognition.interimResults = true;
-      recognition.continuous = false;
+      recognition.interimResults = false; // Only get final results
+      recognition.continuous = false; // Stop after first result
       recognition.maxAlternatives = 1;
       
       recognition.onstart = () => {
@@ -114,8 +114,14 @@ const InputSection = ({
       };
       
       recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setMessage(prev => prev + ' ' + transcript);
+        // Only process if the result is final
+        if (event.results[0].isFinal) {
+          const transcript = event.results[0][0].transcript.trim();
+          setMessage(prev => {
+            const separator = prev ? ' ' : '';
+            return prev + separator + transcript;
+          });
+        }
       };
       
       recognition.onend = () => {
@@ -152,6 +158,9 @@ const InputSection = ({
         subscriptionTier: userProfile.subscription_tier
       });
     }
+    // Close the auth dialog
+    setShowAuthDialog(false);
+    
     if (message.trim()) {
       onSendMessage(message);
       setMessage('');
@@ -163,10 +172,15 @@ const InputSection = ({
       <div className="fixed bottom-8 left-0 right-0 flex justify-center px-2 input-section bg-amp-blue">
         <div className="w-[850px] max-w-[850px] flex items-end">
           <div className="flex items-center space-x-3 mr-3 mb-2">
-            <Mic 
-              className={`w-6 h-6 ${isRecording ? 'text-blue-500' : 'text-blue-400'} hover:text-blue-600 cursor-pointer transition-colors`}
-              onClick={handleVoiceToText}
-            />
+            <div className="relative">
+              <Mic 
+                className={`w-6 h-6 ${isRecording ? 'text-red-500 animate-pulse' : 'text-blue-400'} hover:text-blue-600 cursor-pointer transition-colors`}
+                onClick={handleVoiceToText}
+              />
+              {isRecording && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+              )}
+            </div>
             <ModelDropdown 
               selectedModel={selectedModel}
               selectedSubModel={selectedSubModel}

@@ -61,7 +61,7 @@ const Header = ({
             className={`py-[10px] flex items-center space-x-2 transition-colors bg-amp-dark-blue px-3 rounded-md border ${
               isPromptMode 
                 ? 'border-amp-cyan text-amp-cyan hover:bg-amp-cyan/10' 
-                : 'border-yellow-400 text-yellow-400 hover:bg-yellow-400/10'
+                : 'border-green-400 text-green-400 hover:bg-green-400/10'
             }`}
           >
             <Sparkles className="w-4 h-4" />

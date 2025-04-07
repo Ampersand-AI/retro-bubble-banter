@@ -64,10 +64,10 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
   };
 
   return (
-    <div className="flex justify-center items-center" style={{ height: `calc(100vh - ${inputHeight + 64}px)` }}>
-      <div className="h-full self-start max-w-4xl overflow-hidden">
-        <ScrollArea className="h-full pr-[25px] pt-12 [&_[data-radix-scroll-area-scrollbar]]:w-1 [&_[data-radix-scroll-area-scrollbar]]:bg-amp-cyan/5 [&_[data-radix-scroll-area-scrollbar]]:hover:bg-amp-cyan/10 [&_[data-radix-scroll-area-scrollbar]]:rounded-none">
-          <div className="px-4 py-4">
+    <div className="flex justify-center items-center" style={{ height: `calc(100vh - ${inputHeight + 80}px)` }}>
+    <div className="h-full self-start max-w-4xl overflow-hidden">
+      <ScrollArea className="h-full pr-[25px] pt-12 pb-8 [&_[data-radix-scroll-area-scrollbar]]:w-1 [&_[data-radix-scroll-area-scrollbar]]:bg-amp-cyan/5 [&_[data-radix-scroll-area-scrollbar]]:hover:bg-amp-cyan/10 [&_[data-radix-scroll-area-scrollbar]]:rounded-none">
+        <div className="px-4 py-4">
             <div className="flex flex-col items-center justify-center mb-8">
               <img 
                 src="/images/rovyk-loading.png" 
@@ -76,7 +76,7 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
               />
             </div>
             {messages.map((message) => (
-              <div key={message.id} className="relative group p-2">
+              <div key={message.id} className="relative group p-2 mb-4">
                 <MessageBubble
                   message={message.text}
                   isAi={message.isAi}
@@ -99,7 +99,7 @@ const ChatArea = ({ messages, isTyping }: ChatAreaProps) => {
                 isTyping={true}
               />
             )}
-            <div ref={chatEndRef} />
+            <div ref={chatEndRef} className="h-8" />
           </div>
         </ScrollArea>
       </div>

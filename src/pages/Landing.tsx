@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CRTEffect from '../components/CRTEffect';
 import LandingHeader from '../components/LandingHeader';
 import { Bot, MessageSquare, Zap, CreditCard, Terminal, Sparkles, Shield, Brain, Cpu, Star } from 'lucide-react';
+import DisclaimerDialog from '../components/DisclaimerDialog';
 
 const TypewriterText = ({ text, delay = 100, className = "" }) => {
   const [displayText, setDisplayText] = useState('');
@@ -247,7 +248,7 @@ const Landing = () => {
               <Shield className="w-6 h-6 text-amp-cyan" />
               <h3 className="text-xl font-pixel">Secure & Private</h3>
             </div>
-            <p className="text-amp-gray">Enterprise-grade security with end-to-end encryption and data privacy</p>
+            <p className="text-amp-gray">Enterprise-grade security with end-to-end comprehensive encryption and data privacy protection</p>
           </div>
 
           <div className="bg-amp-blue/30 p-6 rounded-lg border border-amp-cyan/20 hover:border-amp-cyan/40 transition-all hover:scale-105">
@@ -410,7 +411,25 @@ const Landing = () => {
       
       {/* Footer */}
       <footer className="relative z-10 text-center py-6 text-amp-gray text-xs">
-        <p>© 2025 Rovyk - AI Powerhouse by Ampersand</p>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4">
+            <p className="hover:underline">© 2025 Rovyk - AI Powerhouse by Neural Paths</p>
+            <span className="text-amp-cyan/50">|</span>
+            <DisclaimerDialog />
+          </div>
+          <a 
+            href="https://www.producthunt.com/products/rovyk/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-rovyk" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-80 transition-opacity"
+          >
+            <img 
+              src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1049814&theme=light" 
+              alt="Rovyk - Platform to experience the latest model & Prompt Generator | Product Hunt"
+              className="h-8"
+            />
+          </a>
+        </div>
       </footer>
     </div>
   );

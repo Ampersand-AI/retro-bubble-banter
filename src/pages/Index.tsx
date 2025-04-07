@@ -8,6 +8,7 @@ import APIStatus from '../components/APIStatus';
 import TokenStatsDialog from '../components/TokenStatsDialog';
 import AuthDialog from '../components/AuthDialog';
 import SubscriptionDialog from '../components/SubscriptionDialog';
+import LoadingDialog from '../components/LoadingDialog';
 import { AIModel, DEFAULT_SUBMODELS } from '../config/apiConfig';
 import { 
   testOpenAIApi, 
@@ -77,6 +78,7 @@ const Index = () => {
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Generating prompt...");
 
   // Use our custom hook for messages
   const { 
@@ -273,13 +275,28 @@ const Index = () => {
     try {
       console.log('Auth success, updating user profile:', newUserProfile);
       
-      if (!newUserProfile.id) {
-        console.error('No user ID in profile');
+      // Validate the profile data
+      if (!newUserProfile.id || !newUserProfile.email) {
+        console.error('Invalid user profile data');
         throw new Error('Invalid user profile');
       }
 
-      setUserProfile(newUserProfile);
-      setTokenUsage(newUserProfile.token_usage);
+      // Ensure all required fields are present
+      const completeProfile: UserProfile = {
+        id: newUserProfile.id,
+        email: newUserProfile.email,
+        full_name: newUserProfile.full_name || '',
+        is_subscribed: newUserProfile.is_subscribed || false,
+        subscription_tier: newUserProfile.subscription_tier || 'free',
+        token_usage: newUserProfile.token_usage || {
+          total: 0,
+          limit: 5000,
+          remaining: 5000
+        }
+      };
+
+      setUserProfile(completeProfile);
+      setTokenUsage(completeProfile.token_usage);
       setIsAuthenticated(true);
       
       toast({
@@ -399,6 +416,8 @@ const Index = () => {
     }
 
     setIsGeneratingPrompt(true);
+    setLoadingMessage(`Generating prompt for ${selectedTool.name}...`);
+    
     try {
       // Calculate input token usage (user's description)
       const inputTokenCount = Math.ceil(description.length / 4);
@@ -715,6 +734,10 @@ Create a detailed prompt for ${tool.name} based on this product idea: ${descript
           onOpenChange={setShowSubscriptionDialog}
           onSubscribe={handleSubscribe}
           userId={session?.user?.id || ''}
+        />
+        <LoadingDialog
+          isOpen={isGeneratingPrompt}
+          message={loadingMessage}
         />
       </div>
     </CRTEffect>
