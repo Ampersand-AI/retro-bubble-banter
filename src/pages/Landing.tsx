@@ -4,6 +4,8 @@ import CRTEffect from '../components/CRTEffect';
 import LandingHeader from '../components/LandingHeader';
 import { Bot, MessageSquare, Zap, CreditCard, Terminal, Sparkles, Shield, Brain, Cpu, Star } from 'lucide-react';
 import DisclaimerDialog from '../components/DisclaimerDialog';
+import TermsDialog from '../components/TermsDialog';
+import PrivacyDialog from '../components/PrivacyDialog';
 
 const TypewriterText = ({ text, delay = 100, className = "" }) => {
   const [displayText, setDisplayText] = useState('');
@@ -75,23 +77,23 @@ const Landing = () => {
             
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2 text-amp-cyan">
-                <Bot className="w-5 h-5" />
+                <img src="/images/openai.png" alt="OpenAI" className="w-10 h-10" />
                 <span>OpenAI</span>
               </div>
               <div className="flex items-center gap-2 text-amp-cyan">
-                <Bot className="w-5 h-5" />
+                <img src="/images/claude.png" alt="Claude" className="w-10 h-10" />
                 <span>Claude</span>
               </div>
               <div className="flex items-center gap-2 text-amp-cyan">
-                <Bot className="w-5 h-5" />
+                <img src="/images/gemini.png" alt="Gemini" className="w-10 h-10" />
                 <span>Gemini</span>
               </div>
               <div className="flex items-center gap-2 text-amp-cyan">
-                <Bot className="w-5 h-5" />
+                <img src="/images/deepseek.png" alt="DeepSeek" className="w-10 h-10" />
                 <span>DeepSeek</span>
               </div>
               <div className="flex items-center gap-2 text-amp-cyan">
-                <Bot className="w-5 h-5" />
+                <img src="/images/grok.png" alt="Grok" className="w-10 h-10" />
                 <span>Grok</span>
               </div>
             </div>
@@ -106,7 +108,7 @@ const Landing = () => {
             <img 
               src="/images/rovyk-loading.png" 
               alt="Rovyk AI" 
-              className="max-w-xs lg:max-w-md mx-auto object-contain animate-pulse"
+              className="max-w-xs lg:max-w-md mx-auto object-contain "
             />
           </div>
         </div>
@@ -317,7 +319,7 @@ const Landing = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Bot className="w-4 h-4 text-amp-cyan" />
-                  <span>Access to all premiumAI models</span>
+                  <span>Access to all premium AI models</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-amp-cyan" />
@@ -348,7 +350,7 @@ const Landing = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Bot className="w-4 h-4 text-amp-cyan" />
-                  <span>Access to all premiumAI models</span>
+                  <span>Access to all premium AI models</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-amp-cyan" />
@@ -412,10 +414,23 @@ const Landing = () => {
       {/* Footer */}
       <footer className="relative z-10 text-center py-6 text-amp-gray text-xs">
         <div className="flex flex-col items-center justify-center gap-4">
-          <div className="flex items-center justify-center gap-4">
-            <p className="hover:underline">© 2025 Rovyk - AI Powerhouse by Neural Paths</p>
-            <span className="text-amp-cyan/50">|</span>
-            <DisclaimerDialog />
+          <div className="flex items-center justify-between w-full px-6">
+            <p className="hover:underline">© 2025 Rovyk - AI Powerhouse</p>
+            
+            <div className="flex items-center gap-4">
+              <TermsDialog />
+              <span className="text-amp-cyan/50">|</span>
+              <PrivacyDialog />
+              <span className="text-amp-cyan/50">|</span>
+              <DisclaimerDialog />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <p className="hover:underline">A thing by</p>
+              <a href="/" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                <img src="/images/neuralpaths-footer.png" alt="Neural Paths" className="w-25 h-6" />
+              </a>
+            </div>
           </div>
           <a 
             href="https://www.producthunt.com/products/rovyk/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-rovyk" 

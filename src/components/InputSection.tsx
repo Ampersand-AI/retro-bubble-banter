@@ -161,7 +161,8 @@ const InputSection = ({
     // Close the auth dialog
     setShowAuthDialog(false);
     
-    if (message.trim()) {
+    // Only send the message if there's content and we're authenticated
+    if (message.trim() && isAuthenticated) {
       onSendMessage(message);
       setMessage('');
     }

@@ -275,29 +275,17 @@ const Index = () => {
     try {
       console.log('Auth success, updating user profile:', newUserProfile);
       
-      // Validate the profile data
-      if (!newUserProfile.id || !newUserProfile.email) {
-        console.error('Invalid user profile data');
+      if (!newUserProfile.id) {
+        console.error('No user ID in profile');
         throw new Error('Invalid user profile');
       }
 
-      // Ensure all required fields are present
-      const completeProfile: UserProfile = {
-        id: newUserProfile.id,
-        email: newUserProfile.email,
-        full_name: newUserProfile.full_name || '',
-        is_subscribed: newUserProfile.is_subscribed || false,
-        subscription_tier: newUserProfile.subscription_tier || 'free',
-        token_usage: newUserProfile.token_usage || {
-          total: 0,
-          limit: 5000,
-          remaining: 5000
-        }
-      };
-
-      setUserProfile(completeProfile);
-      setTokenUsage(completeProfile.token_usage);
+      setUserProfile(newUserProfile);
+      setTokenUsage(newUserProfile.token_usage);
       setIsAuthenticated(true);
+      
+      // Close any open auth dialogs
+      setShowAuthDialog(false);
       
       toast({
         title: "Success",
@@ -318,8 +306,13 @@ const Index = () => {
     isSubscribed: boolean;
     subscriptionTier?: 'free' | 'pro' | 'enterprise';
   }) => {
+    // Don't create a new profile if we're already authenticated
+    if (isAuthenticated) {
+      return;
+    }
+
     const newProfile: UserProfile = {
-      id: '',  // This will be set by Supabase
+      id: session?.user?.id || '',  // Use the session user ID if available
       email: userProfile.email,
       full_name: '',  // This will be set by the user later
       is_subscribed: userProfile.isSubscribed,

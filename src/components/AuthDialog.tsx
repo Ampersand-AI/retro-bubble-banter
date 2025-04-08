@@ -69,14 +69,8 @@ interface AuthDialogProps {
   onAuthSuccess: (userProfile: {
     id: string;
     email: string;
-    full_name: string;
     is_subscribed: boolean;
     subscription_tier?: 'free' | 'pro' | 'enterprise';
-    token_usage: {
-      total: number;
-      limit: number;
-      remaining: number;
-    };
   }) => void;
 }
 
@@ -202,27 +196,7 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
       }
 
       console.log('Profile fetched successfully:', profile);
-      
-      // Ensure we have all required fields
-      if (!profile.id || !profile.email) {
-        throw new Error('Invalid profile data');
-      }
-
-      // Call onAuthSuccess with the complete profile
-      onAuthSuccess({
-        id: profile.id,
-        email: profile.email,
-        full_name: profile.full_name || '',
-        is_subscribed: profile.is_subscribed || false,
-        subscription_tier: profile.subscription_tier || 'free',
-        token_usage: profile.token_usage || {
-          total: 0,
-          limit: 5000,
-          remaining: 5000
-        }
-      });
-      
-      // Close the dialog after successful auth
+      onAuthSuccess(profile);
       onOpenChange(false);
       
       toast({
