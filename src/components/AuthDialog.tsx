@@ -16,7 +16,7 @@ import { supabase } from "@/lib/supabase";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Validation schemas
@@ -386,6 +386,33 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+
+      if (error) throw error;
+
+      // The OAuth flow will redirect to the callback URL
+      // The callback will handle the user creation and profile setup
+      // We don't need to handle the user data here as it will be handled in the callback
+    } catch (error: any) {
+      console.error('Google sign in error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign in with Google. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6 max-w-md">
@@ -514,153 +541,189 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="signin">
-              <form onSubmit={signInForm.handleSubmit(handleSignIn)} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email" className="text-amp-cyan">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    {...signInForm.register("email")}
-                    className={cn(
-                      "bg-amp-blue border-amp-cyan text-amp-cyan",
-                      signInForm.formState.errors.email && "border-red-500"
-                    )}
-                  />
-                  {signInForm.formState.errors.email && (
-                    <p className="text-sm text-red-500">
-                      {signInForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password" className="text-amp-cyan">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="signin-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      {...signInForm.register("password")}
-                      className={cn(
-                        "bg-amp-blue border-amp-cyan text-amp-cyan",
-                        signInForm.formState.errors.password && "border-red-500"
-                      )}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                  {signInForm.formState.errors.password && (
-                    <p className="text-sm text-red-500">
-                      {signInForm.formState.errors.password.message}
-                    </p>
-                  )}
-                </div>
-                <div className="flex justify-between items-center">
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="text-sm text-amp-cyan hover:text-amp-cyan/80 px-0"
-                    onClick={() => setIsResetPasswordMode(true)}
-                  >
-                    Forgot Password?
-                  </Button>
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90" 
+              <div className="space-y-4">
+                <Button
+                  onClick={handleGoogleSignIn}
+                  className="w-full bg-white text-gray-800 hover:bg-gray-100 flex items-center justify-center gap-2"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Signing in..." : "Sign In"}
+                  <img src="/images/google-icon.png" alt="Google" className="w-5 h-5" />
+                  Sign in with Google
                 </Button>
-              </form>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-amp-cyan/50"></span>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-amp-blue px-2 text-amp-cyan/50">Or continue with email</span>
+                  </div>
+                </div>
+                <form onSubmit={signInForm.handleSubmit(handleSignIn)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email" className="text-amp-cyan">Email</Label>
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      {...signInForm.register("email")}
+                      className={cn(
+                        "bg-amp-blue border-amp-cyan text-amp-cyan",
+                        signInForm.formState.errors.email && "border-red-500"
+                      )}
+                    />
+                    {signInForm.formState.errors.email && (
+                      <p className="text-sm text-red-500">
+                        {signInForm.formState.errors.email.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password" className="text-amp-cyan">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="signin-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        {...signInForm.register("password")}
+                        className={cn(
+                          "bg-amp-blue border-amp-cyan text-amp-cyan",
+                          signInForm.formState.errors.password && "border-red-500"
+                        )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    {signInForm.formState.errors.password && (
+                      <p className="text-sm text-red-500">
+                        {signInForm.formState.errors.password.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-sm text-amp-cyan hover:text-amp-cyan/80 px-0"
+                      onClick={() => setIsResetPasswordMode(true)}
+                    >
+                      Forgot Password?
+                    </Button>
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Signing in..." : "Sign In"}
+                  </Button>
+                </form>
+              </div>
             </TabsContent>
             <TabsContent value="signup">
-              <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-amp-cyan">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    {...signUpForm.register("email")}
-                    className={cn(
-                      "bg-amp-blue border-amp-cyan text-amp-cyan",
-                      signUpForm.formState.errors.email && "border-red-500"
-                    )}
-                  />
-                  {signUpForm.formState.errors.email && (
-                    <p className="text-sm text-red-500">
-                      {signUpForm.formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-amp-cyan">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="signup-password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      {...signUpForm.register("password")}
-                      className={cn(
-                        "bg-amp-blue border-amp-cyan text-amp-cyan",
-                        signUpForm.formState.errors.password && "border-red-500"
-                      )}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                  {signUpForm.formState.errors.password && (
-                    <p className="text-sm text-red-500">
-                      {signUpForm.formState.errors.password.message}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-confirm-password" className="text-amp-cyan">Confirm Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="signup-confirm-password"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
-                      {...signUpForm.register("confirmPassword")}
-                      className={cn(
-                        "bg-amp-blue border-amp-cyan text-amp-cyan",
-                        signUpForm.formState.errors.confirmPassword && "border-red-500"
-                      )}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
-                    >
-                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                  {signUpForm.formState.errors.confirmPassword && (
-                    <p className="text-sm text-red-500">
-                      {signUpForm.formState.errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90" 
+              <div className="space-y-4">
+                <Button
+                  onClick={handleGoogleSignIn}
+                  className="w-full bg-white text-gray-800 hover:bg-gray-100 flex items-center justify-center gap-2"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating account..." : "Sign Up"}
+                  <img src="/images/google-icon.png" alt="Google" className="w-5 h-5" />
+                  Sign up with Google
                 </Button>
-              </form>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-amp-cyan/50"></span>
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-amp-blue px-2 text-amp-cyan/50">Or continue with email</span>
+                  </div>
+                </div>
+                <form onSubmit={signUpForm.handleSubmit(handleSignUp)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email" className="text-amp-cyan">Email</Label>
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      {...signUpForm.register("email")}
+                      className={cn(
+                        "bg-amp-blue border-amp-cyan text-amp-cyan",
+                        signUpForm.formState.errors.email && "border-red-500"
+                      )}
+                    />
+                    {signUpForm.formState.errors.email && (
+                      <p className="text-sm text-red-500">
+                        {signUpForm.formState.errors.email.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password" className="text-amp-cyan">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="signup-password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        {...signUpForm.register("password")}
+                        className={cn(
+                          "bg-amp-blue border-amp-cyan text-amp-cyan",
+                          signUpForm.formState.errors.password && "border-red-500"
+                        )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    {signUpForm.formState.errors.password && (
+                      <p className="text-sm text-red-500">
+                        {signUpForm.formState.errors.password.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm-password" className="text-amp-cyan">Confirm Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="signup-confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm your password"
+                        {...signUpForm.register("confirmPassword")}
+                        className={cn(
+                          "bg-amp-blue border-amp-cyan text-amp-cyan",
+                          signUpForm.formState.errors.confirmPassword && "border-red-500"
+                        )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-amp-cyan hover:text-amp-cyan/80"
+                      >
+                        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    {signUpForm.formState.errors.confirmPassword && (
+                      <p className="text-sm text-red-500">
+                        {signUpForm.formState.errors.confirmPassword.message}
+                      </p>
+                    )}
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-amp-cyan text-amp-blue hover:bg-amp-cyan/90" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating account..." : "Sign Up"}
+                  </Button>
+                </form>
+              </div>
             </TabsContent>
           </Tabs>
         )}

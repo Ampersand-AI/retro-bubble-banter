@@ -6,6 +6,9 @@ import { Bot, MessageSquare, Zap, CreditCard, Terminal, Sparkles, Shield, Brain,
 import DisclaimerDialog from '../components/DisclaimerDialog';
 import TermsDialog from '../components/TermsDialog';
 import PrivacyDialog from '../components/PrivacyDialog';
+import ModelDisplay from '../components/ModelDisplay';
+import ComicImage from '../components/ComicImage';
+import Typewriter from '../components/Typewriter';
 
 const TypewriterText = ({ text, delay = 100, className = "" }) => {
   const [displayText, setDisplayText] = useState('');
@@ -63,7 +66,7 @@ const Landing = () => {
                   <Terminal className="w-4 h-4 text-amp-cyan" />
                   <span className="text-amp-gray">rovyk@terminal:~$</span>
                 </div>
-                <TypewriterText text="Welcome to The AI Powerhouse" />
+                <Typewriter text="Welcome to The AI Powerhouse" className="text-amp-cyan" />
               </div>
             </div>
             
@@ -99,18 +102,20 @@ const Landing = () => {
             </div>
             
             <div className="bg-amp-blue/30 p-4 rounded-lg border border-amp-cyan/20 inline-block">
-              <TypewriterText text="Unlock 5,000 Tokens for FREE" />
+              <Typewriter text="Unlock 5,000 Tokens for FREE" className="text-amp-cyan" />
             </div>
+             
           </div>
           
           {/* Right Side - Image */}
-          <div className="relative">
+          <div className="relative justify-self-end ">
             <img 
               src="/images/rovyk-loading.png" 
               alt="Rovyk AI" 
-              className="max-w-xs lg:max-w-md mx-auto object-contain "
+              className="max-w-xs lg:max-w-md mx-auto object-contain aspect-square "
             />
           </div>
+          
         </div>
 
         {/* New Feature Announcement */}
@@ -174,6 +179,25 @@ const Landing = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Product Hunt Badge */}
+        <div className="max-w-4xl mx-auto">
+        <div className="mt-6 mb-8 flex justify-center">
+            <a 
+              href="https://www.producthunt.com/products/rovyk/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-rovyk" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-amp-blue/30 p-4 rounded-lg   hover:border-amp-cyan/40 transition-all hover:opacity-90"
+            >
+              <img 
+                src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1049814&theme=dark"
+                alt="Rovyk - Platform to experience the latest model & Prompt Generator | Product Hunt"
+                className="h-8 md:h-10"
+              />
+            </a>
+          </div>
+        
         </div>
 
         {/* Features Grid */}
@@ -242,7 +266,7 @@ const Landing = () => {
               <Brain className="w-6 h-6 text-amp-cyan" />
               <h3 className="text-xl font-pixel">Advanced AI Models</h3>
             </div>
-            <p className="text-amp-gray">Access state-of-the-art AI models including GPT-4, Claude, Gemini, and more</p>
+            <ModelDisplay />
           </div>
 
           <div className="bg-amp-blue/30 p-6 rounded-lg border border-amp-cyan/20 hover:border-amp-cyan/40 transition-all hover:scale-105">
@@ -401,23 +425,19 @@ const Landing = () => {
               </button>
             </div>
           </div>
-          <div className="relative">
-            <img 
-              src="/images/rovyk-comic.jpg" 
-              alt="Rovyk AI" 
-              className="w-full max-w-md mx-auto"
-            />
+          <div className="relative w-full max-w-md mx-auto">
+            <ComicImage />
           </div>
         </div>
       </section>
       
       {/* Footer */}
       <footer className="relative z-10 text-center py-6 text-amp-gray text-xs">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <div className="flex items-center justify-between w-full px-6">
-            <p className="hover:underline">© 2025 Rovyk - AI Powerhouse</p>
+        <div className="flex flex-col items-center justify-center gap-4 px-4">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-0 md:justify-between w-full md:px-12">
+            <p className="hover:underline order-2 md:order-1">© 2025 Rovyk - AI Powerhouse</p>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4  order-1 md:order-2">
               <TermsDialog />
               <span className="text-amp-cyan/50">|</span>
               <PrivacyDialog />
@@ -425,25 +445,14 @@ const Landing = () => {
               <DisclaimerDialog />
             </div>
 
-            <div className="flex items-center gap-2">
-              <p className="hover:underline">A thing by</p>
+            <div className="flex items-center gap-2 order-3">
+              <p className="hover:underline hidden md:block">A thing by</p>
               <a href="/" target="_blank" rel="noopener noreferrer" className="hover:underline">
-                <img src="/images/neuralpaths-footer.png" alt="Neural Paths" className="w-25 h-6" />
+                <img src="/images/neuralpaths-footer.png" alt="Neural Paths" className="w-22 md:w-25 h-7 md:h-6" />
               </a>
             </div>
           </div>
-          <a 
-            href="https://www.producthunt.com/products/rovyk/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-rovyk" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:opacity-80 transition-opacity"
-          >
-            <img 
-              src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1049814&theme=light" 
-              alt="Rovyk - Platform to experience the latest model & Prompt Generator | Product Hunt"
-              className="h-8"
-            />
-          </a>
+         
         </div>
       </footer>
     </div>

@@ -25,20 +25,17 @@ export const testOpenAIApi = async (): Promise<boolean> => {
 // Test Claude API availability
 export const testClaudeApi = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`, {
+    const response = await fetch('https://api.anthropic.com/v1/complete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY}`,
-        'x-test-request': 'true'
+        'Authorization': `Bearer ${import.meta.env.VITE_ANTHROPIC_API_KEY}`,
+        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        messages: [
-          {
-            role: 'user',
-            content: 'Hello, this is a test message.'
-          }
-        ]
+        prompt: '\n\nHuman: Hello, this is a test message.\n\nAssistant:',
+        model: 'claude-v1',
+        max_tokens_to_sample: 100
       })
     });
 
@@ -49,12 +46,14 @@ export const testClaudeApi = async (): Promise<boolean> => {
     }
 
     const data = await response.json();
+    console.log('Claude API response:', data);
     return true;
   } catch (error) {
     console.error('Claude API test error:', error);
     return false;
   }
 };
+
 
 // Test Gemini API availability
 export const testGeminiApi = async (): Promise<boolean> => {
