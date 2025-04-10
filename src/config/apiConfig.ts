@@ -3,7 +3,7 @@
 // API Keys for different AI providers
 export const API_KEYS = {
   openai: import.meta.env.VITE_OPENAI_API_KEY,
-  claude: import.meta.env.VITE_CLAUDE_API_KEY,
+  
   gemini: import.meta.env.VITE_GEMINI_API_KEY,
   deepseek: import.meta.env.VITE_DEEPSEEK_API_KEY,
   grok: import.meta.env.VITE_GROK_API_KEY
@@ -24,10 +24,10 @@ if (missingKeys.length > 0) {
 // Default submodels for each AI provider
 export const DEFAULT_SUBMODELS = {
   openai: 'gpt-4o',
-  claude: 'claude-3-7-sonnet',
+  claude: 'claude-3-7-sonnet-20250219',
   gemini: 'gemini-2.0-flash',
   deepseek: 'deepseek-chat',
-  grok: 'grok-2-1212'
+  grok: 'grok-1'
 };
 
 export type Message = {

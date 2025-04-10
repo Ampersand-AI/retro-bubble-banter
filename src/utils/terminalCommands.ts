@@ -63,7 +63,7 @@ export const createTerminalCommands = (
         if (validModels.includes(args[0])) {
           setSelectedModel(args[0] as AIModel);
           setSelectedSubModel(args[0] === 'openai' ? 'gpt-4' : 
-                            args[0] === 'claude' ? 'claude-3-opus' :
+                            args[0] === 'claude' ? 'claude-3-7-sonnet-20250219' :
                             args[0] === 'gemini' ? 'gemini-pro' :
                             args[0] === 'deepseek' ? 'deepseek-chat' : 'grok-1');
           return { 

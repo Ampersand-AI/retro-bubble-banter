@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const models = [
   ['GPT-4o', 'GPT-4o Mini', 'GPT-3.5 Turbo'],
-  ['Claude 3.7 Sonnet', 'Claude 3.5 Sonnet', 'Claude 3.5 Haiku'],
+  ['Claude 3 Opus', 'Claude 3 Sonnet', 'Claude 3 Haiku'],
   ['Gemini 2.0 Flash', 'Gemini 2.0 Flash Lite', 'Gemini 1.5 Flash'],
   ['Deepseek Chat', 'Deepseek Reasoner', 'Grok 2'],
   ['Grok 1.5', 'Grok 1', 'and more...']

@@ -16,7 +16,7 @@ import { supabase } from "@/lib/supabase";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Mail } from "lucide-react";
+import { Eye, EyeOff, Mail, Github } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Validation schemas
@@ -413,6 +413,32 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
     }
   };
 
+  const handleGithubSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+
+      if (error) throw error;
+
+      // The OAuth flow will redirect to the callback URL
+      // The callback will handle the user creation and profile setup
+    } catch (error: any) {
+      console.error('GitHub sign in error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign in with GitHub. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-amp-blue border-2 border-amp-cyan text-amp-cyan p-6 max-w-md">
@@ -542,14 +568,24 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
             </TabsList>
             <TabsContent value="signin">
               <div className="space-y-4">
-                <Button
-                  onClick={handleGoogleSignIn}
-                  className="w-full bg-white text-gray-800 hover:bg-gray-100 flex items-center justify-center gap-2"
-                  disabled={isLoading}
-                >
-                  <img src="/images/google-icon.png" alt="Google" className="w-5 h-5" />
-                  Sign in with Google
-                </Button>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    onClick={handleGoogleSignIn}
+                    className="w-full bg-white text-gray-800 hover:bg-gray-100 flex items-center justify-center gap-2"
+                    disabled={isLoading}
+                  >
+                    <img src="/images/google-icon.png" alt="Google" className="w-5 h-5" />
+                    Google
+                  </Button>
+                  <Button
+                    onClick={handleGithubSignIn}
+                    className="w-full bg-[#24292e] text-white hover:bg-[#24292e]/90 flex items-center justify-center gap-2"
+                    disabled={isLoading}
+                  >
+                    <Github size={20} />
+                    GitHub
+                  </Button>
+                </div>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-amp-cyan/50"></span>
@@ -626,14 +662,24 @@ const AuthDialog = ({ open, onOpenChange, onAuthSuccess }: AuthDialogProps) => {
             </TabsContent>
             <TabsContent value="signup">
               <div className="space-y-4">
-                <Button
-                  onClick={handleGoogleSignIn}
-                  className="w-full bg-white text-gray-800 hover:bg-gray-100 flex items-center justify-center gap-2"
-                  disabled={isLoading}
-                >
-                  <img src="/images/google-icon.png" alt="Google" className="w-5 h-5" />
-                  Sign up with Google
-                </Button>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    onClick={handleGoogleSignIn}
+                    className="w-full bg-white text-gray-800 hover:bg-gray-100 flex items-center justify-center gap-2"
+                    disabled={isLoading}
+                  >
+                    <img src="/images/google-icon.png" alt="Google" className="w-5 h-5" />
+                    Google
+                  </Button>
+                  <Button
+                    onClick={handleGithubSignIn}
+                    className="w-full bg-[#24292e] text-white hover:bg-[#24292e]/90 flex items-center justify-center gap-2"
+                    disabled={isLoading}
+                  >
+                    <Github size={20} />
+                    GitHub
+                  </Button>
+                </div>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-amp-cyan/50"></span>

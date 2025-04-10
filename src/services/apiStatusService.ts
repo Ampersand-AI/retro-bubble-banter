@@ -23,34 +23,40 @@ export const testOpenAIApi = async (): Promise<boolean> => {
 };
 
 // Test Claude API availability
-export const testClaudeApi = async (): Promise<boolean> => {
+export const testClaudeApi = async () => {
   try {
-    const response = await fetch('https://api.anthropic.com/v1/complete', {
+    const response = await fetch('https://eplzqqbsretcqcdbarsz.supabase.co/functions/v1/claude-proxy', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_ANTHROPIC_API_KEY}`,
-        'anthropic-version': '2023-06-01'
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY}`,
+        'x-test-request': 'true'
       },
       body: JSON.stringify({
-        prompt: '\n\nHuman: Hello, this is a test message.\n\nAssistant:',
-        model: 'claude-v1',
-        max_tokens_to_sample: 100
+        model: 'claude-3-opus-20240229',
+        max_tokens: 1024,
+        messages: [
+          {
+            role: 'user',
+            content: 'Hello, this is a test message.'
+          }
+        ]
       })
     });
 
+
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Claude API test error details:', errorData);
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      return { success: false, error: 'Failed to connect to Claude API' };
     }
 
-    const data = await response.json();
-    console.log('Claude API response:', data);
-    return true;
+
+    return { success: true };
   } catch (error) {
-    console.error('Claude API test error:', error);
-    return false;
+    console.warn('Claude API test error:', error);
+    return {
+      success: false,
+      error: 'Failed to connect to Claude API'
+    };
   }
 };
 
