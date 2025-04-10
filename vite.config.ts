@@ -8,6 +8,10 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 3000,
+    hmr: process.env.NODE_ENV === 'production' ? false : {
+      host: 'localhost',
+      protocol: 'ws'
+    }
   },
   plugins: [
     react(),

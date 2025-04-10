@@ -27,7 +27,7 @@ export const DEFAULT_SUBMODELS = {
   claude: 'claude-3-7-sonnet-20250219',
   gemini: 'gemini-2.0-flash',
   deepseek: 'deepseek-chat',
-  grok: 'grok-1'
+  grok: 'grok-2'
 };
 
 export type Message = {

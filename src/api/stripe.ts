@@ -1,14 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(import.meta.env.VITE_STRIPE_SECRET_KEY!, {
   apiVersion: '2025-02-24.acacia',
 });
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
 
 export const createCheckoutSession = async (tier: 'plus' | 'ultra', userId: string) => {
   try {
