@@ -18,11 +18,11 @@ const ComicImage = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-0 pb-[100%] bg-amp-blue/30 rounded-lg overflow-hidden">
+    <div className="relative w-full h-0 pb-[100%] bg-amp-blue/30 rounded-lg overflow-hidden ">
       <img 
         src={selectedImage}
         alt="Rovyk Comic"
-        className="absolute inset-0 w-full h-full object-contain p-4"
+        className="absolute inset-0 w-full h-full object-contain p-4 "
       />
     </div>
   );

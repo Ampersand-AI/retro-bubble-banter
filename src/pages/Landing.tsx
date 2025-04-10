@@ -108,7 +108,7 @@ const Landing = () => {
           </div>
           
           {/* Right Side - Image */}
-          <div className="relative justify-self-end ">
+          <div className="relative lg:justify-self-end -ml-6 lg:ml-0">
             <img 
               src="/images/rovyk-loading.png" 
               alt="Rovyk AI" 
@@ -188,12 +188,12 @@ const Landing = () => {
               href="https://www.producthunt.com/products/rovyk/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-rovyk" 
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-amp-blue/30 p-4 rounded-lg   hover:border-amp-cyan/40 transition-all hover:opacity-90"
+              className="bg-amp-black/30 p-6 rounded-lg hover:border-amp-cyan/40 transition-all hover:opacity-90"
             >
               <img 
                 src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1049814&theme=dark"
                 alt="Rovyk - Platform to experience the latest model & Prompt Generator | Product Hunt"
-                className="h-8 md:h-10"
+                className="h-14 md:h-14" 
               />
             </a>
           </div>
@@ -434,12 +434,12 @@ const Landing = () => {
       {/* Footer */}
       <footer className="relative z-10 text-center py-6 text-amp-gray text-xs">
         <div className="flex flex-col items-center justify-center gap-4 px-4">
-          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-0 md:justify-between w-full md:px-12">
-            <p className="hover:underline order-2 md:order-1">© 2025 Rovyk - AI Powerhouse</p>
+          <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-0 md:justify-between w-full md:px-12">
+            <p className="hover:underline order-2 md:order-3 md:mb-2 lg:mb-0">© 2025 Rovyk - AI Powerhouse</p>
             
-            <div className="flex items-center gap-4  order-1 md:order-2">
+            <div className="flex items-center lg:gap-4 gap-1  order-1 md:order-2">
               <TermsDialog />
-              <span className="text-amp-cyan/50">|</span>
+              <span className="text-amp-cyan/50 ">|</span>
               <PrivacyDialog />
               <span className="text-amp-cyan/50">|</span>
               <DisclaimerDialog />
