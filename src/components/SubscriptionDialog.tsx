@@ -149,9 +149,6 @@ const SubscriptionDialog = ({ open, onOpenChange, onSubscribe, userId }: Subscri
             </Button>
           </div>
         </div>
-        <div className="text-sm text-amp-gray- text-center mt-1">
-          Note: Claude will be coming soon to premium plans
-        </div>
       </DialogContent>
     </Dialog>
   );
