@@ -519,17 +519,16 @@ Create a detailed prompt for ${tool.name} based on this product idea: ${descript
           return openaiData.choices[0].message.content;
         
         case 'claude':
-          response = await fetch('https://api.anthropic.com/v1/messages', {
+          response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-api-key': import.meta.env.VITE_CLAUDE_API_KEY,
-              'anthropic-version': '2023-06-01'
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY}`,
+              'x-test-request': 'true'
             },
             body: JSON.stringify({
-              model: selectedSubModel,
               messages: [{ role: 'user', content: prompt }],
-              max_tokens: 4000
+              model: selectedSubModel
             })
           });
           if (!response.ok) {
@@ -587,7 +586,7 @@ Create a detailed prompt for ${tool.name} based on this product idea: ${descript
           return deepseekData.choices[0].message.content;
         
         case 'grok':
-          response = await fetch('https://api.grok.com/v1/chat/completions', {
+          response = await fetch('https://api.x.ai/v1/chat/completions', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

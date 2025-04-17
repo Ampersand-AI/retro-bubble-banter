@@ -1,28 +1,25 @@
 import { Resend } from 'resend';
-import { NextResponse } from 'next/server';
+import express, { Request, Response } from 'express';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function POST(request: Request) {
+export const supportRouter = express.Router();
+
+supportRouter.post('/', express.json(), async (req: Request, res: Response) => {
   try {
-    const body = await request.json();
-    const { name, email, message } = body;
+    const { name, email, message } = req.body;
 
     // Validate required fields
     if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      );
+      res.status(400).json({ error: 'Invalid email format' });
+      return;
     }
 
     // Send email using Resend
@@ -39,12 +36,11 @@ export async function POST(request: Request) {
       `,
     });
 
-    return NextResponse.json({ success: true, data });
+    res.json({ success: true, data });
   } catch (error) {
     console.error('Error sending support email:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to send support request' },
-      { status: 500 }
-    );
+    res.status(500).json({
+      error: error instanceof Error ? error.message : 'Failed to send support request'
+    });
   }
-} 
+}); 

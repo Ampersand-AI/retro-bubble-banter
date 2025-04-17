@@ -23,7 +23,7 @@ export const testOpenAIApi = async (): Promise<boolean> => {
 };
 
 // Test Claude API availability
-export const testClaudeApi = async () => {
+export const testClaudeApi = async (): Promise<boolean> => {
   try {
     const response = await fetch('https://eplzqqbsretcqcdbarsz.supabase.co/functions/v1/claude-proxy', {
       method: 'POST',
@@ -44,19 +44,10 @@ export const testClaudeApi = async () => {
       })
     });
 
-
-    if (!response.ok) {
-      return { success: false, error: 'Failed to connect to Claude API' };
-    }
-
-
-    return { success: true };
+    return response.ok;
   } catch (error) {
     console.warn('Claude API test error:', error);
-    return {
-      success: false,
-      error: 'Failed to connect to Claude API'
-    };
+    return false;
   }
 };
 

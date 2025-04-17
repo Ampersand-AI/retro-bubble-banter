@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, Options } from 'http-proxy-middleware';
 
 
 dotenv.config();
@@ -26,7 +26,7 @@ const anthropicProxy = createProxyMiddleware({
     proxyReq.setHeader('x-api-key', process.env.VITE_ANTHROPIC_API_KEY || '');
     proxyReq.setHeader('anthropic-version', '2023-06-01');
   },
-});
+} as Options);
 
 
 // Use the proxy for Claude API requests
