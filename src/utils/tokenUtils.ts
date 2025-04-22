@@ -27,7 +27,7 @@ export const checkModelIdentityQuestion = (text: string): boolean => {
 
 // Get standardized identity response
 export const getIdentityResponse = (): string => {
-  return "I am Rovyk by Neural Paths. I'm here to assist you with any questions or tasks you might have.";
+  return "I am Rovyk by NeuralArc. I'm here to assist you with any questions or tasks you might have.";
 };
 
 // Simulated AI response for when real APIs are unavailable

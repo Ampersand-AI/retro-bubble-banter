@@ -13,7 +13,7 @@ export const useMessages = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hi, I'm Rovyk by Neural Paths! You can experience various premium AI models at a fraction of the cost.",
+      text: "Hi, I'm Rovyk by NeuralArc! You can experience various premium AI models at a fraction of the cost.",
       isAi: true,
       tokenCount: {
         input: 0,

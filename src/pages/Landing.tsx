@@ -447,8 +447,9 @@ const Landing = () => {
 
             <div className="flex items-center gap-2 order-3">
               <p className="hover:underline hidden md:block">A thing by</p>
-              <a href="/" target="_blank" rel="noopener noreferrer" className="hover:underline">
-                <img src="/images/neuralpaths-footer.png" alt="Neural Paths" className="w-22 md:w-25 h-7 md:h-6" />
+              <a href="/" target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1">
+                <img src="/images/neural-footer.png" alt="NeuralArc" className="w-22 md:w-25 h-7 md:h-6" />
+                <span className="text-base font-pixel">NeuralArc</span>
               </a>
             </div>
           </div>
